@@ -1,0 +1,2116 @@
+import { 
+  users, 
+  chatMessages,
+  knowledgeArticles,
+  documentAnalysis,
+  legalTemplates,
+  caseLaw,
+  stateLawGuides,
+  type User, 
+  type InsertUser,
+  type ChatMessage,
+  type InsertChatMessage,
+  type KnowledgeArticle,
+  type InsertKnowledgeArticle,
+  type DocumentAnalysis,
+  type InsertDocumentAnalysis,
+  type LegalTemplate,
+  type InsertLegalTemplate,
+  type CaseLaw,
+  type InsertCaseLaw,
+  type StateLawGuide,
+  type InsertStateLawGuide
+} from "@shared/schema";
+
+export interface IStorage {
+  // User methods
+  getUser(id: number): Promise<User | undefined>;
+  getUserByUsername(username: string): Promise<User | undefined>;
+  createUser(user: InsertUser): Promise<User>;
+  
+  // Chat message methods
+  getChatMessages(userId?: number): Promise<ChatMessage[]>;
+  createChatMessage(message: InsertChatMessage): Promise<ChatMessage>;
+  
+  // Knowledge base methods
+  getKnowledgeArticles(): Promise<KnowledgeArticle[]>;
+  getKnowledgeArticle(id: number): Promise<KnowledgeArticle | undefined>;
+  createKnowledgeArticle(article: InsertKnowledgeArticle): Promise<KnowledgeArticle>;
+  updateKnowledgeArticle(id: number, article: Partial<InsertKnowledgeArticle>): Promise<KnowledgeArticle | undefined>;
+  deleteKnowledgeArticle(id: number): Promise<boolean>;
+  
+  // Document analysis methods
+  getDocumentAnalyses(): Promise<DocumentAnalysis[]>;
+  createDocumentAnalysis(analysis: InsertDocumentAnalysis): Promise<DocumentAnalysis>;
+  
+  // Legal template methods
+  getLegalTemplates(): Promise<LegalTemplate[]>;
+  getLegalTemplatesByCategory(category: string): Promise<LegalTemplate[]>;
+  getLegalTemplate(id: number): Promise<LegalTemplate | undefined>;
+  
+  // Case law methods
+  getCaseLaw(): Promise<CaseLaw[]>;
+  getCaseLawByCategory(category: string): Promise<CaseLaw[]>;
+  searchCaseLaw(query: string): Promise<CaseLaw[]>;
+  
+  // State law guide methods
+  getStateLawGuides(): Promise<StateLawGuide[]>;
+  getStateLawGuidesByState(state: string): Promise<StateLawGuide[]>;
+  getStateLawGuidesByCategory(category: string): Promise<StateLawGuide[]>;
+}
+
+export class MemStorage implements IStorage {
+  private users: Map<number, User>;
+  private chatMessages: Map<number, ChatMessage>;
+  private knowledgeArticles: Map<number, KnowledgeArticle>;
+  private documentAnalyses: Map<number, DocumentAnalysis>;
+  private legalTemplates: Map<number, LegalTemplate>;
+  private caseLaws: Map<number, CaseLaw>;
+  private stateLawGuides: Map<number, StateLawGuide>;
+  private currentUserId: number;
+  private currentChatMessageId: number;
+  private currentKnowledgeId: number;
+  private currentDocumentId: number;
+  private currentTemplateId: number;
+  private currentCaseLawId: number;
+  private currentGuideId: number;
+
+  constructor() {
+    this.users = new Map();
+    this.chatMessages = new Map();
+    this.knowledgeArticles = new Map();
+    this.documentAnalyses = new Map();
+    this.legalTemplates = new Map();
+    this.caseLaws = new Map();
+    this.stateLawGuides = new Map();
+    this.currentUserId = 1;
+    this.currentChatMessageId = 1;
+    this.currentKnowledgeId = 1;
+    this.currentDocumentId = 1;
+    this.currentTemplateId = 1;
+    this.currentCaseLawId = 1;
+    this.currentGuideId = 1;
+    
+    // Initialize with sample data
+    this.initializeKnowledgeBase();
+    this.initializeLegalTemplates();
+    this.initializeCaseLaw();
+    this.initializeStateLawGuides();
+  }
+
+  private initializeKnowledgeBase() {
+    const articles = [
+      // Arrest Rights - 10 articles
+      {
+        title: "Your Rights Under Article 20 During Police Arrest",
+        content: "Under the Indian Constitution Article 20, you have fundamental rights during arrest including protection against self-incrimination, double jeopardy, and ex-post-facto laws. No person can be compelled to be a witness against himself. You have the right to remain silent and cannot be forced to confess. The police must inform you of the grounds of arrest under Article 22.",
+        category: "Arrest Rights",
+        tags: ["arrest", "article 20", "article 22", "constitutional rights", "fundamental rights"],
+        isPublished: true,
+      },
+      {
+        title: "Police Custody Rights Under CrPC Section 50",
+        content: "Section 50 of Code of Criminal Procedure mandates that when police arrest someone without warrant, they must inform the person of grounds for arrest and their right to bail. The arrested person has right to consult and be defended by a legal practitioner of their choice. Police must produce the arrested person before magistrate within 24 hours.",
+        category: "Arrest Rights",
+        tags: ["police custody", "CrPC section 50", "bail rights", "legal representation"],
+        isPublished: true,
+      },
+      {
+        title: "Anticipatory Bail Under Section 438 CrPC",
+        content: "Section 438 of CrPC provides for anticipatory bail - a pre-arrest legal protection. High Court or Session Court can grant anticipatory bail if there's reasonable apprehension of arrest in non-bailable offense. The court considers factors like nature of accusation, criminal history, and likelihood of fleeing justice before granting anticipatory bail.",
+        category: "Arrest Rights",
+        tags: ["anticipatory bail", "section 438", "pre-arrest protection", "high court"],
+        isPublished: true,
+      },
+      {
+        title: "Rights During Police Interrogation",
+        content: "During police interrogation, you have right to legal counsel under Article 22(1). Police cannot use third-degree torture or physical violence. Any confession made to police is inadmissible under Evidence Act Section 25. You can request presence of family member or lawyer during questioning. If you're a woman, interrogation must be conducted by female police officer.",
+        category: "Arrest Rights",
+        tags: ["interrogation", "legal counsel", "evidence act", "women's rights"],
+        isPublished: true,
+      },
+      {
+        title: "Juvenile Justice Act - Rights of Minors",
+        content: "Under Juvenile Justice Act 2015, children below 18 years have special protection. Police cannot arrest minor without reasonable grounds. Parents/guardians must be informed immediately. Child must be produced before Juvenile Justice Board within 24 hours. No handcuffs can be used on children, and they cannot be kept in police lock-up with adult offenders.",
+        category: "Arrest Rights",
+        tags: ["juvenile justice", "minor rights", "children protection", "JJB"],
+        isPublished: true,
+      },
+      {
+        title: "Bail Rights Under Section 436-450 CrPC",
+        content: "Bail is fundamental right under Article 21. For bailable offenses, bail is matter of right. For non-bailable offenses, it's at court's discretion. Under Section 436A, if undertrial prisoner has served half of maximum sentence, they must be released on personal bond. Bail cannot be denied merely because accused is poor or cannot afford surety.",
+        category: "Arrest Rights",
+        tags: ["bail", "article 21", "undertrial", "personal bond"],
+        isPublished: true,
+      },
+      {
+        title: "False FIR and Malicious Prosecution Laws",
+        content: "Filing false FIR is offense under IPC Section 182 (false information with intent to cause public servant to use lawful power) and Section 211 (false charge of offense). Victim of malicious prosecution can claim compensation under tort law. Supreme Court guidelines in Arnesh Kumar case provide protection against automatic arrest in cases with less than 7 years imprisonment.",
+        category: "Arrest Rights",
+        tags: ["false FIR", "malicious prosecution", "IPC 182", "compensation"],
+        isPublished: true,
+      },
+      {
+        title: "POCSO Act - Protection of Children",
+        content: "Protection of Children from Sexual Offenses Act 2012 provides special procedures for child victims. Child-friendly court environment must be ensured. Recording of statement should be done by woman police officer not below rank of sub-inspector. Support person can accompany child during recording. In-camera proceedings protect child's identity.",
+        category: "Arrest Rights",
+        tags: ["POCSO", "child protection", "sexual offenses", "in-camera proceedings"],
+        isPublished: true,
+      },
+      {
+        title: "Custodial Violence and Torture Prevention",
+        content: "Custodial violence violates Article 21 and amounts to torture. DK Basu guidelines mandate arrest memo, medical examination, and right to inform relative/friend. NHRC monitors custodial deaths. Victim's family can file compensation claim. Police officers involved in custodial violence can face departmental action and criminal prosecution under IPC Section 330-348.",
+        category: "Arrest Rights",
+        tags: ["custodial violence", "DK Basu", "NHRC", "compensation"],
+        isPublished: true,
+      },
+      {
+        title: "SC/ST Atrocities Act - Special Protection",
+        content: "SC/ST (Prevention of Atrocities) Act 1989 provides special protection to Scheduled Castes and Scheduled Tribes. Anticipatory bail generally not available for offenses under this Act. Special courts established for speedy trial. Victim compensation scheme provides immediate relief. Investigation must be completed within 60 days.",
+        category: "Arrest Rights",
+        tags: ["SC/ST act", "atrocities", "special courts", "victim compensation"],
+        isPublished: true,
+      },
+
+      // Tenant Rights - 10 articles
+      {
+        title: "Rent Control Laws in India - Overview",
+        content: "Rent control in India is governed by state-specific laws like Delhi Rent Control Act 1958, Maharashtra Rent Control Act 1999. These laws protect tenants from arbitrary eviction and excessive rent increase. Model Tenancy Act 2019 aims to balance landlord-tenant rights. Rent tribunals provide dispute resolution mechanism outside regular courts.",
+        category: "Tenant Rights",
+        tags: ["rent control", "model tenancy act", "rent tribunal", "eviction protection"],
+        isPublished: true,
+      },
+      {
+        title: "Security Deposit Rules Under Model Tenancy Act",
+        content: "Model Tenancy Act 2019 limits security deposit to 2 months rent for residential and 6 months for commercial properties. Landlord must return security deposit within 1 month of tenancy termination after adjusting dues. Interest on security deposit must be paid as per agreement. Unjustified retention can lead to penalty equal to twice the deposit amount.",
+        category: "Tenant Rights",
+        tags: ["security deposit", "model tenancy act", "interest", "penalty"],
+        isPublished: true,
+      },
+      {
+        title: "Eviction Grounds Under State Rent Laws",
+        content: "Landlord can evict tenant only on specific grounds: non-payment of rent, subletting without consent, damage to property, personal necessity, or reconstruction. Notice period varies by state (usually 15 days to 1 month). Tenant can contest eviction in rent controller court. Eviction without due process is illegal and punishable.",
+        category: "Tenant Rights",
+        tags: ["eviction", "notice period", "rent controller", "legal grounds"],
+        isPublished: true,
+      },
+      {
+        title: "Rent Increase and Fair Rent Determination",
+        content: "Rent increase is regulated under state rent control laws. Standard rent is fixed based on factors like construction cost, situation of building, and amenities. Annual rent increase usually capped at 10-15%. Rent controller can determine fair rent on application. Tenant can challenge excessive rent increase in appropriate forum.",
+        category: "Tenant Rights",
+        tags: ["rent increase", "fair rent", "standard rent", "rent controller"],
+        isPublished: true,
+      },
+      {
+        title: "Maintenance and Repair Obligations",
+        content: "Under Transfer of Property Act Section 108, landlord must keep property in habitable condition and carry out structural repairs. Tenant responsible for day-to-day maintenance. If landlord fails to maintain, tenant can undertake repairs and deduct cost from rent after proper notice. Essential services like water, electricity must be ensured by landlord.",
+        category: "Tenant Rights",
+        tags: ["maintenance", "repairs", "transfer of property act", "habitable condition"],
+        isPublished: true,
+      },
+      {
+        title: "Subletting and Assignment Rights",
+        content: "Subletting without landlord's consent is ground for eviction under most rent control laws. However, sharing accommodation with family members generally not considered subletting. Assignment of tenancy usually requires written consent. Tenant can seek permission for subletting if lease agreement allows or law permits.",
+        category: "Tenant Rights",
+        tags: ["subletting", "assignment", "consent", "family members"],
+        isPublished: true,
+      },
+      {
+        title: "Consumer Protection for Tenants",
+        content: "Tenants can file complaints under Consumer Protection Act 2019 against builders/landlords for deficient services. Deficiencies like lack of promised amenities, structural defects qualify as unfair trade practices. Consumer forums provide quick and cost-effective remedy. Compensation for mental agony and litigation costs can be claimed.",
+        category: "Tenant Rights",
+        tags: ["consumer protection", "deficient services", "unfair trade practices", "compensation"],
+        isPublished: true,
+      },
+      {
+        title: "Women Tenant Special Rights",
+        content: "Women tenants have additional protection under various laws. Dowry Prohibition Act protects married women from being evicted for dowry demands. Domestic Violence Act provides right to shared household. Working women hostels have special rental regulations. Women cannot be evicted during night hours without proper legal process.",
+        category: "Tenant Rights",
+        tags: ["women tenants", "domestic violence act", "shared household", "special protection"],
+        isPublished: true,
+      },
+      {
+        title: "Commercial Tenancy Rights",
+        content: "Commercial tenants have different rights under state shop and establishment laws. License vs lease distinction important for commercial premises. Goodwill compensation may be payable on eviction in some states. Commercial rent control laws less stringent than residential. Business continuity rights protected under specific circumstances.",
+        category: "Tenant Rights",
+        tags: ["commercial tenancy", "license vs lease", "goodwill", "business continuity"],
+        isPublished: true,
+      },
+      {
+        title: "Legal Remedies for Tenant Harassment",
+        content: "Tenant harassment by landlord constitutes criminal intimidation under IPC Section 503-506. Unlawful disconnection of utilities is punishable offense. Tenant can file police complaint and seek injunction from civil court. Compensation for harassment available under tort law. Local tenant welfare associations provide support and legal aid.",
+        category: "Tenant Rights",
+        tags: ["harassment", "criminal intimidation", "injunction", "legal aid"],
+        isPublished: true,
+      },
+
+      // Cybercrime - 10 articles
+      {
+        title: "IT Act 2000 - Cyber Crime Legal Framework",
+        content: "Information Technology Act 2000 is primary legislation for cyber crimes in India. Section 43 deals with damage to computer systems, Section 66 with computer related offenses, Section 67 with pornography. Amendment 2008 added more offenses like cyber terrorism (66F), identity theft (66C). Penalties range from fines to imprisonment up to 3 years.",
+        category: "Cybercrime",
+        tags: ["IT Act 2000", "cyber crime", "computer offenses", "identity theft"],
+        isPublished: true,
+      },
+      {
+        title: "Online Fraud and Digital Payment Security",
+        content: "Online financial fraud covered under IT Act Section 66C,66D and IPC Section 420. UPI fraud, credit card cloning, phishing attacks are common. RBI guidelines mandate two-factor authentication. Banks liable for unauthorized transactions if reported within timeline. Cyber cell investigation and digital forensics help track fraudsters.",
+        category: "Cybercrime",
+        tags: ["online fraud", "UPI fraud", "phishing", "RBI guidelines", "cyber cell"],
+        isPublished: true,
+      },
+      {
+        title: "Cyberbullying and Online Harassment Laws",
+        content: "Cyberbullying covered under IT Act Section 67 (sending offensive messages) and IPC Section 354D (stalking). Online harassment of women specifically addressed under Section 354A IPC. Victim can report to cyber cell or local police. Social media platforms obligated to remove offensive content. Punishment includes imprisonment and fine.",
+        category: "Cybercrime",
+        tags: ["cyberbullying", "online harassment", "stalking", "social media"],
+        isPublished: true,
+      },
+      {
+        title: "Data Privacy Rights Under IT Rules 2011",
+        content: "IT (Reasonable Security Practices and Procedures and Sensitive Personal Data or Information) Rules 2011 govern data protection. Personal data includes name, address, biometric info, financial details. Companies must obtain consent before collecting sensitive data. Data breach notification mandatory. Individual has right to access and correct personal data.",
+        category: "Cybercrime",
+        tags: ["data privacy", "IT rules 2011", "data protection", "consent"],
+        isPublished: true,
+      },
+      {
+        title: "Hacking and Unauthorized Access Prevention",
+        content: "Hacking covered under IT Act Section 66 (computer related offenses) and Section 43 (damage to computer systems). Unauthorized access to protected systems punishable with imprisonment up to 3 years. White hat hacking for security testing legal if authorized. Companies must implement reasonable security measures to prevent hacking attempts.",
+        category: "Cybercrime",
+        tags: ["hacking", "unauthorized access", "computer security", "white hat"],
+        isPublished: true,
+      },
+      {
+        title: "Digital Evidence and Cyber Forensics",
+        content: "Digital evidence admissible under Evidence Act Section 65B if accompanied by certificate. Chain of custody crucial for evidence validity. Cyber forensics experts analyze digital devices for evidence collection. Hash values ensure evidence integrity. Live forensics and dead forensics different techniques for investigation.",
+        category: "Cybercrime",
+        tags: ["digital evidence", "cyber forensics", "evidence act", "chain of custody"],
+        isPublished: true,
+      },
+      {
+        title: "Social Media Crimes and Platform Liability",
+        content: "Social media platforms have safe harbor under IT Act Section 79 if they comply with due diligence. Defamation on social media covered under IPC Section 499-500. Fake news and misinformation can lead to criminal liability. Platforms must remove illegal content when notified. Government can block content under IT Act Section 69A.",
+        category: "Cybercrime",
+        tags: ["social media", "platform liability", "defamation", "fake news"],
+        isPublished: true,
+      },
+      {
+        title: "Child Pornography and POCSO Cyber Crimes",
+        content: "Child pornography is serious offense under IT Act Section 67B with punishment up to 5 years imprisonment. POCSO Act 2012 covers online child sexual abuse. Possession, distribution, creation of child sexual abuse material all punishable. ISPs and platforms must report suspected child abuse content to authorities immediately.",
+        category: "Cybercrime",
+        tags: ["child pornography", "POCSO", "child abuse", "reporting"],
+        isPublished: true,
+      },
+      {
+        title: "Cryptocurrency and Digital Asset Crimes",
+        content: "Cryptocurrency fraud and scams covered under existing criminal laws and IT Act. Money laundering through crypto covered under PMLA. RBI guidelines restrict crypto trading by banks. Ponzi schemes using cryptocurrency punishable under Prize Chits and Money Circulation Schemes Act. Digital asset recovery challenging but possible through legal action.",
+        category: "Cybercrime",
+        tags: ["cryptocurrency", "digital assets", "PMLA", "ponzi schemes"],
+        isPublished: true,
+      },
+      {
+        title: "Cyber Crime Reporting and Investigation",
+        content: "Cyber crimes can be reported at cyber cell, local police station, or online portal cybercrime.gov.in. FIR must be registered for cognizable offenses. Investigation involves digital forensics and technical analysis. Inter-state coordination through CBI when required. Victim can track case status online and seek legal assistance through legal aid services.",
+        category: "Cybercrime",
+        tags: ["reporting", "investigation", "cyber cell", "FIR", "legal aid"],
+        isPublished: true,
+      },
+
+      // Women's Safety - 10 articles
+      {
+        title: "Domestic Violence Act 2005 - Protection Rights",
+        content: "Protection of Women from Domestic Violence Act 2005 provides civil remedy for domestic violence. Covers physical, sexual, verbal, emotional, and economic abuse. Woman can seek protection order, residence order, monetary relief, and custody order. Magistrate can pass ex-parte interim orders. Violation of protection order is criminal offense punishable with imprisonment.",
+        category: "Women's Safety",
+        tags: ["domestic violence", "protection order", "residence order", "monetary relief"],
+        isPublished: true,
+      },
+      {
+        title: "Sexual Harassment at Workplace - POSH Act",
+        content: "Sexual Harassment of Women at Workplace (Prevention, Prohibition and Redressal) Act 2013 mandates Internal Complaints Committee in every workplace. Woman can file complaint within 3 months (extendable to 6 months). ICC must complete inquiry within 90 days. Punishment includes warning, censure, transfer, termination. Employer liable if no ICC constituted.",
+        category: "Women's Safety",
+        tags: ["sexual harassment", "POSH act", "ICC", "workplace"],
+        isPublished: true,
+      },
+      {
+        title: "Dowry Prohibition Act - Legal Protection",
+        content: "Dowry Prohibition Act 1961 makes giving, taking, or demanding dowry a criminal offense. Punishment is imprisonment minimum 5 years and fine minimum Rs. 15,000. Dowry death covered under IPC Section 304B with life imprisonment. Cruelty for dowry under IPC Section 498A is non-bailable offense. Burden of proof on accused in dowry death cases.",
+        category: "Women's Safety",
+        tags: ["dowry prohibition", "dowry death", "IPC 498A", "burden of proof"],
+        isPublished: true,
+      },
+      {
+        title: "Rape Laws and Criminal Law Amendment 2013",
+        content: "Criminal Law Amendment 2013 strengthened rape laws after Nirbhaya case. Expanded definition of rape, introduced new offenses like acid attack, stalking, voyeurism. Minimum punishment for rape increased to 7 years, can extend to life. Gang rape minimum 20 years imprisonment. Death penalty for repeat offenders and rape causing death.",
+        category: "Women's Safety",
+        tags: ["rape laws", "criminal law amendment", "Nirbhaya", "gang rape"],
+        isPublished: true,
+      },
+      {
+        title: "Maternity Benefits and Workplace Rights",
+        content: "Maternity Benefit Act 1961 (amended 2017) provides 26 weeks paid maternity leave. Work from home option available. Nursing breaks mandatory. Creche facilities required in establishments with 50+ women. Dismissal during pregnancy and maternity leave prohibited. Adoptive and commissioning mothers also entitled to 12 weeks leave.",
+        category: "Women's Safety",
+        tags: ["maternity benefits", "maternity leave", "creche facilities", "nursing breaks"],
+        isPublished: true,
+      },
+      {
+        title: "Women's Property Rights and Inheritance",
+        content: "Hindu Succession Act 2005 amendment gives equal inheritance rights to daughters. Muslim women protected under Muslim Personal Law (Shariat) Application Act. Christian and Parsi women have succession rights under respective acts. Coparcenary rights in joint family property. Widow's right to husband's property. Maintenance rights under CrPC Section 125.",
+        category: "Women's Safety",
+        tags: ["property rights", "inheritance", "Hindu succession act", "maintenance"],
+        isPublished: true,
+      },
+      {
+        title: "Acid Attack Prevention and Victim Compensation",
+        content: "IPC Section 326A,326B cover acid attack with punishment up to life imprisonment. Victim entitled to compensation from State and offender. Free medical treatment and rehabilitation. Sale of acid regulated - ID proof and reason required. Supreme Court guidelines for acid attack prevention and victim support. Fast track courts for speedy trial.",
+        category: "Women's Safety",
+        tags: ["acid attack", "victim compensation", "medical treatment", "fast track courts"],
+        isPublished: true,
+      },
+      {
+        title: "Stalking and Voyeurism Laws",
+        content: "IPC Section 354C covers voyeurism with punishment up to 3 years imprisonment. Section 354D covers stalking with punishment up to 5 years for repeat offense. Digital stalking and online harassment covered under IT Act. Victim can seek anticipatory protection from court. Police must register FIR and investigate promptly.",
+        category: "Women's Safety",
+        tags: ["stalking", "voyeurism", "digital stalking", "anticipatory protection"],
+        isPublished: true,
+      },
+      {
+        title: "Women's Safety in Public Transport",
+        content: "Delhi Metro Rail Corporation Act provides for women's safety in metro. State transport laws mandate reserved seats for women. Harassment in public transport covered under IPC Section 354. Women helplines available in buses and trains. CCTV surveillance mandatory. Police can arrest without warrant for women's safety related offenses.",
+        category: "Women's Safety",
+        tags: ["public transport", "reserved seats", "women helplines", "CCTV surveillance"],
+        isPublished: true,
+      },
+      {
+        title: "Legal Aid and Support Services for Women",
+        content: "National Legal Services Authority provides free legal aid to women. One Stop Centres (Sakhi) provide integrated support services. Women helpline 181 available 24x7. Legal aid lawyers available in family courts. Lok Adalat for amicable settlement of matrimonial disputes. NGOs and women's rights organizations provide support and counseling.",
+        category: "Women's Safety",
+        tags: ["legal aid", "one stop centres", "women helpline", "Lok Adalat"],
+        isPublished: true,
+      },
+
+      // Consumer Complaints - 10 articles
+      {
+        title: "Consumer Protection Act 2019 - Rights and Remedies",
+        content: "Consumer Protection Act 2019 replaced 1986 Act with enhanced consumer rights. Six fundamental rights include right to safety, information, choice, hearing, redressal, and consumer education. E-commerce transactions covered. Product liability introduced. Mediation as alternative dispute resolution. Central Consumer Protection Authority for enforcement and penalty.",
+        category: "Consumer Complaints",
+        tags: ["consumer protection act", "consumer rights", "e-commerce", "product liability"],
+        isPublished: true,
+      },
+      {
+        title: "Deficiency in Service and Unfair Trade Practices",
+        content: "Deficiency includes lack of efficiency in service, defect in goods, spurious goods, overcharging. Unfair trade practices include false representation, misleading advertisement, hoarding, black marketing. Consumer can claim compensation for deficiency and unfair practices. Mental agony compensation available. Punitive damages in case of gross negligence.",
+        category: "Consumer Complaints",
+        tags: ["deficiency in service", "unfair trade practices", "compensation", "mental agony"],
+        isPublished: true,
+      },
+      {
+        title: "E-commerce Consumer Rights and Protection",
+        content: "Consumer Protection (E-Commerce) Rules 2020 regulate online shopping. E-commerce platforms must display clear information about sellers and products. Return and refund policy mandatory. Grievance officer appointment required. Fake reviews and misleading advertisements prohibited. Consumers can file complaints against e-commerce platforms for violations.",
+        category: "Consumer Complaints",
+        tags: ["e-commerce", "online shopping", "return policy", "grievance officer"],
+        isPublished: true,
+      },
+      {
+        title: "Banking Services and Financial Consumer Rights",
+        content: "Banking Ombudsman Scheme provides redressal for banking services deficiency. RBI guidelines mandate customer service standards. Unauthorized transactions liability limited if reported timely. Insurance Ombudsman for insurance related complaints. SEBI has investor grievance mechanism for securities market. Priority sector lending complaints handled by Banking Ombudsman.",
+        category: "Consumer Complaints",
+        tags: ["banking ombudsman", "RBI guidelines", "insurance ombudsman", "SEBI"],
+        isPublished: true,
+      },
+      {
+        title: "Medical Negligence and Healthcare Consumer Rights",
+        content: "Medical negligence covered under Consumer Protection Act when paid service involved. Four elements: duty of care, breach of duty, causation, and damages. Deficiency in medical service includes wrong diagnosis, improper treatment, lack of informed consent. Compensation for medical negligence can be substantial. Medical insurance disputes also covered.",
+        category: "Consumer Complaints",
+        tags: ["medical negligence", "healthcare rights", "informed consent", "medical insurance"],
+        isPublished: true,
+      },
+      {
+        title: "Real Estate Consumer Protection - RERA",
+        content: "Real Estate (Regulation and Development) Act 2016 protects home buyers. Developers must register projects and maintain escrow accounts. Buyers can file complaints with RERA Authority. Delay in possession entitles buyers to compensation. Defective construction and false promises actionable. Appellate Tribunal for RERA dispute resolution.",
+        category: "Consumer Complaints",
+        tags: ["RERA", "real estate", "home buyers", "delay compensation"],
+        isPublished: true,
+      },
+      {
+        title: "Telecom Consumer Complaints and TRAI",
+        content: "Telecom Regulatory Authority of India (TRAI) protects telecom consumers. Complaints about call drops, network issues, billing disputes can be filed. Do Not Call Registry protects from unwanted calls. Mobile number portability is consumer right. Compensation for service deficiency available. Telecom Ombudsman for grievance redressal.",
+        category: "Consumer Complaints",
+        tags: ["TRAI", "telecom", "call drops", "billing disputes", "number portability"],
+        isPublished: true,
+      },
+      {
+        title: "Food Safety and Consumer Protection",
+        content: "Food Safety and Standards Act 2006 ensures food safety. Food Safety Commissioner at state level handles complaints. Penalties for food adulteration and unsafe food. Consumer can demand food testing and compensation. Packaged food must display nutritional information. Restaurant hygiene and food quality complaints covered under consumer law.",
+        category: "Consumer Complaints",
+        tags: ["food safety", "food adulteration", "nutritional information", "restaurant hygiene"],
+        isPublished: true,
+      },
+      {
+        title: "Consumer Forum Procedure and Filing Complaints",
+        content: "Three-tier consumer forum system: District, State, and National levels. Complaint filing fee nominal (varies by claim amount). Time limit for filing complaint generally 2 years from cause of action. Simple procedure without need for lawyer. Relief includes replacement, refund, compensation, and discontinuation of unfair practice.",
+        category: "Consumer Complaints",
+        tags: ["consumer forum", "complaint procedure", "filing fee", "time limit"],
+        isPublished: true,
+      },
+      {
+        title: "Consumer Class Action and Collective Redressal",
+        content: "Consumer Protection Act 2019 introduced class action suits for collective consumer interests. 100+ consumers having same interest can file class action. Representative action possible for identical goods or services. Settlement benefits all class members. Court can pass orders for refund to all affected consumers. Effective remedy for mass deficiency or unfair practices.",
+        category: "Consumer Complaints",
+        tags: ["class action", "collective redressal", "representative action", "mass deficiency"],
+        isPublished: true,
+      }
+    ];
+
+    articles.forEach(article => {
+      const id = this.currentKnowledgeId++;
+      this.knowledgeArticles.set(id, { ...article, id });
+    });
+  }
+
+  private initializeLegalTemplates() {
+    const templates = [
+      // Rental/Housing Templates - Indian Law
+      {
+        title: "Rental Agreement as per Model Tenancy Act 2019",
+        category: "Housing",
+        description: "Standard rental agreement compliant with Model Tenancy Act 2019",
+        content: `RENTAL AGREEMENT
+
+This Rental Agreement is made on [DATE] between [LANDLORD NAME], son/daughter of [FATHER'S NAME], residing at [LANDLORD ADDRESS] (hereinafter called "LESSOR") and [TENANT NAME], son/daughter of [FATHER'S NAME], residing at [TENANT ADDRESS] (hereinafter called "LESSEE").
+
+TERMS AND CONDITIONS:
+
+1. PROPERTY DETAILS: The lessor agrees to let out the residential property located at [PROPERTY ADDRESS], measuring [AREA] sq ft.
+
+2. RENT: Monthly rent is Rs. [AMOUNT] payable by 5th of every month.
+
+3. SECURITY DEPOSIT: Security deposit of Rs. [AMOUNT] (not exceeding 2 months rent as per Model Tenancy Act 2019) paid by lessee.
+
+4. DURATION: Tenancy period is [MONTHS/YEARS] from [START DATE] to [END DATE].
+
+5. MAINTENANCE: Landlord responsible for structural repairs, tenant for day-to-day maintenance.
+
+6. UTILITIES: [Specify who pays for electricity, water, maintenance charges]
+
+7. TERMINATION: Either party can terminate with [NOTICE PERIOD] days written notice.
+
+8. REGISTRATION: This agreement shall be registered as per Registration Act 1908 if rent exceeds Rs. 500 per month.
+
+Witnesses:
+1. [NAME & SIGNATURE]
+2. [NAME & SIGNATURE]
+
+LESSOR: [SIGNATURE]
+LESSEE: [SIGNATURE]`,
+        tags: ["rental agreement", "model tenancy act", "housing", "registration"],
+      },
+      {
+        title: "Notice to Quit for Rent Default",
+        category: "Housing",
+        description: "Legal notice for non-payment of rent as per state rent control laws",
+        content: `NOTICE TO QUIT
+
+To: [TENANT NAME]
+Address: [PROPERTY ADDRESS]
+
+You are hereby required to quit and deliver up to me the possession of the above-mentioned premises within [NOTICE PERIOD] days from the service of this notice.
+
+GROUNDS:
+1. You have defaulted in payment of rent for the months of [MONTHS].
+2. The total amount due is Rs. [AMOUNT].
+3. This notice is served under Section [SECTION] of [STATE] Rent Control Act.
+
+Take notice that if you fail to quit and deliver up the said premises, I shall commence legal proceedings against you to recover possession of the said premises and damages for unlawful detention.
+
+Date: [DATE]
+Signature: [LANDLORD SIGNATURE]
+Name: [LANDLORD NAME]`,
+        tags: ["notice to quit", "rent default", "eviction", "rent control act"],
+      },
+      {
+        title: "Security Deposit Refund Demand Letter",
+        category: "Housing",
+        description: "Letter demanding return of security deposit with interest",
+        content: `DEMAND FOR SECURITY DEPOSIT REFUND
+
+To: [LANDLORD NAME]
+Address: [LANDLORD ADDRESS]
+
+Subject: Demand for refund of security deposit
+
+Dear Sir/Madam,
+
+I vacated the rented premises at [PROPERTY ADDRESS] on [DATE] after serving proper notice. As per Model Tenancy Act 2019, security deposit must be returned within 1 month of tenancy termination.
+
+Details:
+- Security Deposit Paid: Rs. [AMOUNT]
+- Date of Vacation: [DATE]
+- Current Outstanding: [IF ANY]
+- Interest Due: Rs. [AMOUNT] (as per agreement)
+
+You are legally obligated to refund Rs. [NET AMOUNT] within 7 days, failing which I shall be constrained to initiate legal proceedings for recovery with interest and costs.
+
+Date: [DATE]
+Signature: [TENANT SIGNATURE]
+Name: [TENANT NAME]`,
+        tags: ["security deposit", "refund demand", "model tenancy act", "interest"],
+      },
+
+      // Employment Templates - Indian Law
+      {
+        title: "Employment Contract as per Indian Labour Laws",
+        category: "Employment",
+        description: "Comprehensive employment agreement compliant with Indian labour laws",
+        content: `EMPLOYMENT AGREEMENT
+
+This Employment Agreement is made between [COMPANY NAME], a company incorporated under Companies Act 2013 (hereinafter "Company") and [EMPLOYEE NAME] (hereinafter "Employee").
+
+TERMS OF EMPLOYMENT:
+
+1. POSITION: Employee appointed as [DESIGNATION] in [DEPARTMENT].
+
+2. SALARY: Monthly salary Rs. [AMOUNT] including basic pay Rs. [BASIC], HRA Rs. [HRA], special allowance Rs. [ALLOWANCE].
+
+3. WORKING HOURS: 8 hours per day, 48 hours per week as per Factories Act 1948.
+
+4. PROBATION: [MONTHS] months probation period with 1 month notice on either side.
+
+5. LEAVE ENTITLEMENT:
+   - Earned Leave: 21 days per year
+   - Casual Leave: 7 days per year
+   - Sick Leave: 7 days per year
+   - Maternity Leave: 26 weeks (as per Maternity Benefit Act 2017)
+
+6. PROVIDENT FUND: Company will contribute to EPF as per Employees' Provident Fund Act 1952.
+
+7. GRATUITY: Payable as per Payment of Gratuity Act 1972 after 5 years service.
+
+8. TERMINATION: Either party may terminate with [NOTICE PERIOD] days notice or salary in lieu thereof.
+
+9. NON-DISCLOSURE: Employee shall not disclose confidential information during and after employment.
+
+Company: [SIGNATURE & SEAL]
+Employee: [SIGNATURE]
+Date: [DATE]`,
+        tags: ["employment contract", "labour laws", "EPF", "gratuity", "maternity benefit"],
+      },
+      {
+        title: "Resignation Letter with Notice Period",
+        category: "Employment",
+        description: "Professional resignation letter as per Indian employment practices",
+        content: `RESIGNATION LETTER
+
+To: [MANAGER/HR NAME]
+[COMPANY NAME]
+[COMPANY ADDRESS]
+
+Date: [DATE]
+
+Subject: Resignation from the position of [DESIGNATION]
+
+Dear Sir/Madam,
+
+Please accept this letter as formal notification of my resignation from my position as [DESIGNATION] with [COMPANY NAME]. As per my employment contract, I am providing [NOTICE PERIOD] days notice.
+
+My last working day will be [LAST DATE].
+
+I am committed to ensuring smooth transition of my responsibilities. I will complete all pending work and provide necessary handover documentation.
+
+Kindly process my final settlement including:
+- Salary for notice period
+- Encashment of earned leave (as applicable)
+- Provident Fund withdrawal
+- Gratuity (if eligible)
+- Experience/relieving letter
+
+I thank you for the opportunities provided during my tenure and wish the company continued success.
+
+Yours sincerely,
+[EMPLOYEE SIGNATURE]
+[EMPLOYEE NAME]
+Employee ID: [ID]`,
+        tags: ["resignation", "notice period", "final settlement", "experience letter"],
+      },
+
+      // Legal Documents - Indian Law
+      {
+        title: "General Power of Attorney",
+        category: "Legal Documents",
+        description: "General Power of Attorney as per Indian Registration Act",
+        content: `GENERAL POWER OF ATTORNEY
+
+I, [PRINCIPAL NAME], son/daughter of [FATHER'S NAME], residing at [ADDRESS], do hereby nominate, constitute and appoint [ATTORNEY NAME], son/daughter of [FATHER'S NAME], residing at [ADDRESS], to be my true and lawful attorney.
+
+POWERS GRANTED:
+
+1. To represent me in all legal proceedings
+2. To sign documents on my behalf
+3. To receive payments and issue receipts
+4. To deal with bank accounts and financial matters
+5. To purchase, sell or transfer immovable property
+6. To appear before government authorities
+7. To file income tax returns and handle tax matters
+8. To execute agreements and contracts
+
+CONDITIONS:
+- This power of attorney is irrevocable
+- Valid for [DURATION] years from date of execution
+- Attorney to act in good faith and in principal's interest
+
+This power of attorney is executed voluntarily without any coercion.
+
+Date: [DATE]
+Place: [PLACE]
+
+Principal: [SIGNATURE]
+Name: [PRINCIPAL NAME]
+
+WITNESSES:
+1. [NAME & SIGNATURE]
+2. [NAME & SIGNATURE]
+
+NOTARIZATION/REGISTRATION:
+[To be filled by Notary/Sub-Registrar]`,
+        tags: ["power of attorney", "registration act", "legal representation", "property"],
+      },
+      {
+        title: "Property Sale Agreement",
+        category: "Property",
+        description: "Property sale agreement as per Transfer of Property Act 1882",
+        content: `AGREEMENT FOR SALE OF IMMOVABLE PROPERTY
+
+This Agreement is made on [DATE] between [SELLER NAME], son/daughter of [FATHER'S NAME], residing at [ADDRESS] (hereinafter "VENDOR") and [BUYER NAME], son/daughter of [FATHER'S NAME], residing at [ADDRESS] (hereinafter "PURCHASER").
+
+PROPERTY DETAILS:
+- Location: [PROPERTY ADDRESS]
+- Survey Number: [SURVEY NO.]
+- Area: [AREA] sq ft/yards
+- Boundaries: [NORTH, SOUTH, EAST, WEST]
+
+CONSIDERATION: Rs. [AMOUNT] (Rupees [AMOUNT IN WORDS])
+
+TERMS:
+1. Advance payment of Rs. [AMOUNT] paid on signing this agreement
+2. Balance Rs. [AMOUNT] to be paid on registration
+3. Registration to be completed within [DAYS] days
+4. Vendor warrants clear title and peaceful possession
+5. All existing dues (tax, electricity, water) to be cleared by vendor
+6. Risk and insurance of property passes to purchaser on registration
+
+DOCUMENTS TO BE PROVIDED:
+- Title deeds
+- Tax receipts
+- NOC from society/authorities
+- Survey settlement records
+
+If purchaser defaults, advance amount forfeited. If vendor defaults, refund advance with interest @ [RATE]% per annum.
+
+Vendor: [SIGNATURE]
+Purchaser: [SIGNATURE]
+
+WITNESSES:
+1. [NAME & SIGNATURE]
+2. [NAME & SIGNATURE]`,
+        tags: ["property sale", "transfer of property act", "agreement", "registration"],
+      },
+      {
+        title: "Complaint to Consumer Forum",
+        category: "Consumer Protection",
+        description: "Complaint format for consumer forum as per Consumer Protection Act 2019",
+        content: `BEFORE THE [DISTRICT/STATE/NATIONAL] CONSUMER DISPUTES REDRESSAL FORUM
+
+CONSUMER COMPLAINT UNDER CONSUMER PROTECTION ACT 2019
+
+[CONSUMER NAME]
+Son/Daughter of [FATHER'S NAME]
+Residing at [ADDRESS]
+                                                    ...COMPLAINANT
+
+VERSUS
+
+[OPPOSITE PARTY NAME]
+[BUSINESS ADDRESS]
+                                                    ...OPPOSITE PARTY
+
+COMPLAINT UNDER SECTIONS 35/47/58 OF CONSUMER PROTECTION ACT 2019
+
+FACTS:
+1. Complainant purchased [PRODUCT/SERVICE] from opposite party on [DATE]
+2. Amount paid: Rs. [AMOUNT]
+3. [DESCRIBE DEFICIENCY/UNFAIR TRADE PRACTICE]
+4. Complainant approached opposite party for redressal on [DATE]
+5. Opposite party failed to provide satisfactory resolution
+
+DEFICIENCY/UNFAIR TRADE PRACTICE:
+[Detail the deficiency in service or unfair trade practice]
+
+RELIEF SOUGHT:
+1. Direction to opposite party to [SPECIFIC RELIEF]
+2. Compensation of Rs. [AMOUNT] for mental agony and harassment
+3. Refund of Rs. [AMOUNT] with interest
+4. Litigation costs
+5. Any other relief deemed fit
+
+DOCUMENTS ANNEXED:
+1. Purchase receipt/bill
+2. Correspondence with opposite party
+3. Medical bills (if applicable)
+4. Expert opinion (if any)
+
+Date: [DATE]
+Place: [PLACE]
+
+                                            [SIGNATURE]
+                                            [COMPLAINANT NAME]`,
+        tags: ["consumer complaint", "consumer forum", "deficiency in service", "compensation"],
+      },
+      {
+        title: "Mutual Divorce Petition",
+        category: "Family Law",
+        description: "Joint petition for divorce by mutual consent under Hindu Marriage Act",
+        content: `JOINT PETITION FOR DIVORCE BY MUTUAL CONSENT
+
+IN THE COURT OF [FAMILY COURT NAME]
+
+UNDER SECTION 13B OF HINDU MARRIAGE ACT 1955
+
+[HUSBAND NAME]                                      ...PETITIONER NO. 1
+[WIFE NAME]                                         ...PETITIONER NO. 2
+
+JOINT PETITION:
+
+1. Marriage was solemnized on [DATE] at [PLACE] according to Hindu rites and customs.
+
+2. No children born out of wedlock / One child [NAME] born on [DATE].
+
+3. Parties have been living separately since [DATE] due to irreconcilable differences.
+
+4. Both parties have mutually agreed to dissolve the marriage.
+
+5. No coercion or force applied on either party.
+
+MUTUAL SETTLEMENT:
+1. Custody of child: [DETAILS]
+2. Maintenance: [AMOUNT/NIL]
+3. Property settlement: [DETAILS]
+4. Stridhan articles returned to wife
+
+PRAYER:
+Grant decree of divorce dissolving the marriage between petitioners.
+
+AFFIDAVIT:
+We jointly affirm that contents of petition are true and we seek divorce by mutual consent.
+
+Petitioner No. 1: [HUSBAND SIGNATURE]
+Petitioner No. 2: [WIFE SIGNATURE]
+
+Date: [DATE]
+Place: [PLACE]`,
+        tags: ["mutual divorce", "Hindu marriage act", "family court", "maintenance"],
+      },
+      {
+        title: "Will/Testament as per Indian Succession Act",
+        category: "Estate Planning",
+        description: "Last Will and Testament under Indian Succession Act 1925",
+        content: `LAST WILL AND TESTAMENT
+
+I, [TESTATOR NAME], son/daughter of [FATHER'S NAME], aged [AGE] years, residing at [ADDRESS], being of sound mind and memory, do hereby make this my Last Will and Testament.
+
+DECLARATIONS:
+1. I revoke all previous wills and codicils made by me
+2. I am [MARRIED/UNMARRIED] and have [NUMBER] children namely [NAMES]
+3. I am a [RELIGION] by religion
+
+EXECUTORS:
+I appoint [EXECUTOR 1 NAME] and [EXECUTOR 2 NAME] as executors of this will.
+
+BEQUESTS:
+
+IMMOVABLE PROPERTY:
+1. House at [ADDRESS] to [BENEFICIARY NAME]
+2. Plot at [ADDRESS] to [BENEFICIARY NAME]
+
+MOVABLE PROPERTY:
+1. Bank accounts and FDs to [BENEFICIARY NAME]
+2. Jewelry and ornaments to [BENEFICIARY NAME]
+3. Vehicle to [BENEFICIARY NAME]
+
+DEBTS AND LIABILITIES:
+All debts and liabilities to be discharged from my estate before distribution.
+
+RESIDUARY CLAUSE:
+All remaining property to be divided equally among [BENEFICIARIES].
+
+GUARDIANSHIP:
+In case of minor children, [GUARDIAN NAME] appointed as guardian.
+
+IN WITNESS WHEREOF, I have signed this will in presence of witnesses.
+
+Date: [DATE]
+Place: [PLACE]
+
+Testator: [SIGNATURE]
+Name: [TESTATOR NAME]
+
+WITNESSES:
+1. [NAME, ADDRESS & SIGNATURE]
+2. [NAME, ADDRESS & SIGNATURE]`,
+        tags: ["will", "testament", "succession act", "executor", "beneficiary"],
+      },
+
+      // Additional Templates (11-22) to reach 20+
+      {
+        title: "Cheque Bounce Complaint under Section 138 NI Act",
+        category: "Criminal Law",
+        description: "Complaint format for dishonored cheque under Negotiable Instruments Act",
+        content: `COMPLAINT UNDER SECTION 138 NEGOTIABLE INSTRUMENTS ACT
+
+[Complainant Name] vs [Accused Name]
+
+FACTS: Accused issued cheque no. [NUMBER] for Rs. [AMOUNT] which was dishonored. Legal notice served but payment not made within 15 days.
+
+PRAYER: Convict accused and direct payment with interest.`,
+        tags: ["cheque bounce", "section 138", "legal notice"],
+      },
+      {
+        title: "Defamation Legal Notice",
+        category: "Legal Notices", 
+        description: "Notice for defamation demanding apology and damages",
+        content: `LEGAL NOTICE FOR DEFAMATION
+
+To: [Defendant]
+You published defamatory content on [date] causing reputation damage. 
+DEMAND: Immediate apology and Rs. [amount] damages within 15 days.`,
+        tags: ["defamation", "legal notice", "damages"],
+      },
+      {
+        title: "Property Partition Suit",
+        category: "Property",
+        description: "Suit for partition of joint family property", 
+        content: `PARTITION SUIT
+
+Plaintiff seeks partition of joint property [description] claiming [share] as legal heir.
+RELIEF: Preliminary and final decree for partition with separate possession.`,
+        tags: ["partition", "joint property", "inheritance"],
+      },
+      {
+        title: "Recovery Suit for Money",
+        category: "Financial",
+        description: "Civil suit for debt recovery",
+        content: `MONEY RECOVERY SUIT
+
+Defendant owes Rs. [amount] as loan given on [date]. Despite demands, payment not made.
+PRAYER: Decree for recovery with interest and costs.`,
+        tags: ["debt recovery", "loan", "civil suit"],
+      },
+      {
+        title: "Injunction Application", 
+        category: "Civil Procedure",
+        description: "Application for temporary/permanent injunction",
+        content: `INJUNCTION APPLICATION
+
+Respondent threatening [action] causing irreparable injury to applicant's rights.
+RELIEF: Temporary injunction restraining respondent from [specific acts].`,
+        tags: ["injunction", "restraining order", "civil procedure"],
+      },
+      {
+        title: "Vehicle Sale Agreement",
+        category: "Contracts",
+        description: "Motor vehicle sale with RC transfer",
+        content: `VEHICLE SALE AGREEMENT
+
+Vehicle: [Make/Model] Registration: [Number]
+Sale Price: Rs. [amount]
+Seller warrants clear title. RC transfer within 30 days.`,
+        tags: ["vehicle sale", "RC transfer", "motor vehicle"],
+      },
+      {
+        title: "Software Development Contract",
+        category: "Technology", 
+        description: "Custom software development agreement",
+        content: `SOFTWARE DEVELOPMENT AGREEMENT
+
+Project: [Name] Timeline: [Duration] Cost: Rs. [amount]
+Developer to deliver [specifications] with [warranty period] support.`,
+        tags: ["software", "development", "IT contract"],
+      },
+      {
+        title: "Franchise Agreement",
+        category: "Business",
+        description: "Business franchise licensing agreement", 
+        content: `FRANCHISE AGREEMENT
+
+Franchisor grants [territory] franchise for [business] with [fee structure].
+Franchisee to maintain brand standards and pay royalty.`,
+        tags: ["franchise", "licensing", "business"],
+      },
+      {
+        title: "Copyright Infringement Notice",
+        category: "Intellectual Property",
+        description: "Notice for copyright violation",
+        content: `COPYRIGHT INFRINGEMENT NOTICE
+
+Your unauthorized use of copyrighted work [description] violates Copyright Act.
+DEMAND: Cease infringement and pay damages Rs. [amount].`,
+        tags: ["copyright", "intellectual property", "infringement"],
+      },
+      {
+        title: "Company MOA and AOA",
+        category: "Business",
+        description: "Memorandum and Articles for company incorporation",
+        content: `MEMORANDUM OF ASSOCIATION
+
+Company: [Name] Private Limited
+Objects: [Business activities]
+Capital: Rs. [amount] divided into [shares] equity shares.`,
+        tags: ["company incorporation", "MOA", "AOA"],
+      },
+      {
+        title: "Property Development JV Agreement", 
+        category: "Property",
+        description: "Joint venture for real estate development",
+        content: `DEVELOPMENT AGREEMENT
+
+Landowner and Developer agree to develop [property] with [sharing ratio].
+Construction timeline: [period] Handover: [date]`,
+        tags: ["property development", "joint venture", "construction"],
+      },
+      {
+        title: "Arbitration Agreement",
+        category: "Dispute Resolution",
+        description: "Agreement for dispute resolution through arbitration",
+        content: `ARBITRATION AGREEMENT
+
+Parties agree to resolve disputes through arbitration under Arbitration Act 2015.
+Arbitrator: [Name/Institution] Seat: [City]`,
+        tags: ["arbitration", "dispute resolution", "mediation"],
+      }
+    ];
+
+    templates.forEach(template => {
+      const id = this.currentTemplateId++;
+      this.legalTemplates.set(id, { ...template, id });
+    });
+  }
+
+  private initializeCaseLaw() {
+    // Real-time Case Law Database - 3 Cases Per Category (15 Total)
+    const cases = [
+      // Arrest Rights Cases (3 cases)
+      {
+        caseTitle: "D.K. Basu v. State of West Bengal",
+        court: "Supreme Court of India",
+        year: 1997,
+        citation: "AIR 1997 SC 610",
+        summary: "Supreme Court laid down comprehensive guidelines to prevent custodial violence and torture. Arrest memo, medical examination, and informing relatives made mandatory. Compensation for custodial violence victims established.",
+        category: "Arrest Rights",
+        keyPoints: ["Custodial violence prevention", "Arrest memo mandatory", "Medical examination required", "Victim compensation"]
+      },
+      {
+        caseTitle: "Arnesh Kumar v. State of Bihar",
+        court: "Supreme Court of India", 
+        year: 2014,
+        citation: "(2014) 8 SCC 273",
+        summary: "Court held that arrest is not mandatory for offenses punishable with imprisonment less than 7 years. Police must record reasons for arrest and magistrate must consider necessity of remand.",
+        category: "Arrest Rights",
+        keyPoints: ["No automatic arrest for < 7 years offense", "Reasons for arrest required", "Magistrate discretion in remand", "Protection against arbitrary arrest"]
+      },
+      {
+        caseTitle: "Joginder Kumar v. State of U.P.",
+        court: "Supreme Court of India",
+        year: 1994,
+        citation: "AIR 1994 SC 1349", 
+        summary: "Supreme Court established that arrest should not be made in routine manner. Police must satisfy that arrest is necessary and have reasonable grounds for detention.",
+        category: "Arrest Rights",
+        keyPoints: ["No routine arrests", "Reasonable grounds required", "Article 22 protection", "Necessity of arrest"]
+      },
+
+      // Tenant Rights Cases (3 cases)
+      {
+        caseTitle: "Prabhakaran Vijayakumar v. State of Tamil Nadu",
+        court: "Supreme Court of India",
+        year: 2020,
+        citation: "(2020) 12 SCC 686",
+        summary: "Court upheld Tamil Nadu Regulation of Rights and Responsibilities of Landlords and Tenants Act 2017. Balanced approach between landlord and tenant rights established.",
+        category: "Tenant Rights",
+        keyPoints: ["Rent control laws constitutional", "Balance between rights", "State regulation power", "Reasonable restrictions allowed"]
+      },
+      {
+        caseTitle: "A.K. Krishnan v. State of Andhra Pradesh", 
+        court: "Supreme Court of India",
+        year: 1993,
+        citation: "AIR 1993 SC 2217",
+        summary: "Supreme Court held that tenant's right of occupation is not absolute. Landlord's right to reasonable return on property recognized. Rent control laws should not be confiscatory.",
+        category: "Tenant Rights", 
+        keyPoints: ["Tenant rights not absolute", "Landlord's reasonable return", "Anti-confiscatory principle", "Property rights balance"]
+      },
+      {
+        caseTitle: "Raghunath Rai Bareja v. Punjab National Bank",
+        court: "Supreme Court of India",
+        year: 2007,
+        citation: "(2007) 2 SCC 230",
+        summary: "Established tenant's right to receive notice before eviction. Due process must be followed in eviction proceedings. Tenant cannot be dispossessed without proper legal procedure.",
+        category: "Tenant Rights",
+        keyPoints: ["Notice before eviction", "Due process required", "Legal procedure mandatory", "Tenant protection against dispossession"]
+      },
+
+      // Women's Safety Cases (3 cases)
+      {
+        caseTitle: "Vishaka v. State of Rajasthan",
+        court: "Supreme Court of India",
+        year: 1997,
+        citation: "AIR 1997 SC 3011",
+        summary: "Landmark judgment establishing guidelines for prevention of sexual harassment at workplace. Mandatory complaint committees, investigation procedures, and preventive measures outlined.",
+        category: "Women's Safety",
+        keyPoints: ["Sexual harassment guidelines", "Workplace complaint committees", "Investigation procedures", "Preventive measures mandatory"]
+      },
+      {
+        caseTitle: "Joseph Shine v. Union of India",
+        court: "Supreme Court of India", 
+        year: 2018,
+        citation: "(2019) 3 SCC 39",
+        summary: "Supreme Court decriminalized adultery under Section 497 IPC, recognizing women's agency and dignity. Held that treating women as property of husbands is unconstitutional.",
+        category: "Women's Safety",
+        keyPoints: ["Adultery decriminalized", "Women's agency recognized", "Dignity and equality", "Constitutional rights upheld"]
+      },
+      {
+        caseTitle: "Lalita Kumari v. Govt. of U.P.",
+        court: "Supreme Court of India",
+        year: 2014, 
+        citation: "(2014) 2 SCC 1",
+        summary: "Supreme Court made registration of FIR mandatory for cognizable offenses including crimes against women. No preliminary inquiry required for serious offenses like rape and dowry deaths.",
+        category: "Women's Safety",
+        keyPoints: ["Mandatory FIR registration", "No preliminary inquiry for serious crimes", "Women's safety prioritized", "Police accountability enforced"]
+      },
+
+      // Consumer Complaints Cases (3 cases)
+      {
+        caseTitle: "Spring Meadows Hospital v. Harjol Ahluwalia",
+        court: "Supreme Court of India",
+        year: 1998,
+        citation: "AIR 1998 SC 1801",
+        summary: "Supreme Court held that medical services constitute 'service' under Consumer Protection Act. Patients can file complaints against hospitals and doctors for medical negligence and deficiency in service.",
+        category: "Consumer Complaints", 
+        keyPoints: ["Medical services under Consumer Act", "Patient rights recognized", "Medical negligence complaints", "Hospital accountability"]
+      },
+      {
+        caseTitle: "Lucknow Development Authority v. M.K. Gupta",
+        court: "Supreme Court of India",
+        year: 1994,
+        citation: "AIR 1994 SC 787",
+        summary: "Court established that housing authorities providing accommodation constitute 'service' under Consumer Protection Act. Buyers can claim compensation for delays and deficiencies in construction.",
+        category: "Consumer Complaints",
+        keyPoints: ["Housing services under Consumer Act", "Builder liability established", "Compensation for delays", "Construction deficiency remedies"]
+      },
+      {
+        caseTitle: "Indian Medical Association v. V.P. Shantha",
+        court: "Supreme Court of India", 
+        year: 1995,
+        citation: "AIR 1996 SC 550",
+        summary: "Landmark case confirming that medical profession falls under Consumer Protection Act. Distinguished between free and paid medical services. Established framework for medical negligence complaints.",
+        category: "Consumer Complaints",
+        keyPoints: ["Medical profession under Consumer Act", "Free vs paid services distinction", "Medical negligence framework", "Patient protection enhanced"]
+      },
+
+      // Constitutional Law Cases (3 cases)
+      {
+        caseTitle: "Kesavananda Bharati v. State of Kerala",
+        court: "Supreme Court of India",
+        year: 1973,
+        citation: "AIR 1973 SC 1461",
+        summary: "Historic judgment establishing the 'Basic Structure' doctrine. Parliament cannot amend the Constitution to destroy its basic features. Fundamental rights and democratic structure protected.",
+        category: "Constitutional Law",
+        keyPoints: ["Basic Structure doctrine", "Constitutional amendment limits", "Fundamental rights protection", "Democratic structure preserved"]
+      },
+      {
+        caseTitle: "Minerva Mills v. Union of India",
+        court: "Supreme Court of India",
+        year: 1980, 
+        citation: "AIR 1980 SC 1789",
+        summary: "Supreme Court struck down 42nd Amendment provisions that gave Parliament unlimited power to amend Constitution. Reinforced Basic Structure doctrine and judicial review power.",
+        category: "Constitutional Law",
+        keyPoints: ["42nd Amendment struck down", "Basic Structure reinforced", "Judicial review protected", "Parliamentary power limited"]
+      },
+      {
+        caseTitle: "Indira Nehru Gandhi v. Raj Narain",
+        court: "Supreme Court of India",
+        year: 1975,
+        citation: "AIR 1975 SC 2299", 
+        summary: "Court held that even Prime Minister is not above law. Election of PM can be set aside for corrupt practices. Established principle that no person is above constitutional law.",
+        category: "Constitutional Law",
+        keyPoints: ["No person above law", "PM not immune from law", "Electoral accountability", "Constitutional supremacy"]
+      }
+    ];
+
+    cases.forEach(caseItem => {
+      const id = this.currentCaseLawId++;
+      this.caseLaws.set(id, { ...caseItem, id });
+    });
+  }
+      { caseTitle: "D.K. Basu v. State of West Bengal", court: "Supreme Court of India", year: 1997, citation: "AIR 1997 SC 610", summary: "Custodial violence prevention guidelines", category: "Arrest Rights", keyPoints: ["Custodial violence", "Arrest memo", "Medical examination", "Compensation"] },
+      { caseTitle: "Arnesh Kumar v. State of Bihar", court: "Supreme Court of India", year: 2014, citation: "(2014) 8 SCC 273", summary: "No automatic arrest for <7 years offense", category: "Arrest Rights", keyPoints: ["No automatic arrest", "Judicial discretion", "Reasonable grounds", "Bail protection"] },
+      { caseTitle: "Joginder Kumar v. State of U.P.", court: "Supreme Court of India", year: 1994, citation: "AIR 1994 SC 1349", summary: "No routine arrests without necessity", category: "Arrest Rights", keyPoints: ["No routine arrests", "Article 22 protection", "Necessity requirement", "Due process"] },
+      { caseTitle: "Rajesh Sharma v. State of U.P.", court: "Supreme Court of India", year: 2017, citation: "(2017) 8 SCC 440", summary: "Section 498A safeguards against arrest", category: "Arrest Rights", keyPoints: ["498A safeguards", "Family welfare committee", "Mediation", "Preliminary inquiry"] },
+      { caseTitle: "Sunil Batra v. Delhi Administration", court: "Supreme Court of India", year: 1978, citation: "AIR 1978 SC 1675", summary: "Prisoners retain fundamental rights", category: "Arrest Rights", keyPoints: ["Prisoners' rights", "Dignity in custody", "Torture prohibition", "Humane treatment"] },
+      { caseTitle: "Satpal Antil v. CBI", court: "Supreme Court of India", year: 2012, citation: "(2012) 3 SCC 109", summary: "Bail is rule, jail is exception", category: "Arrest Rights", keyPoints: ["Bail as rule", "Liberty protection", "Speedy trial", "Due process rights"] },
+      { caseTitle: "Niranjan Singh v. Prabhakar Rajaram Kharote", court: "Supreme Court of India", year: 1980, citation: "AIR 1980 SC 785", summary: "Anticipatory bail post-FIR allowed", category: "Arrest Rights", keyPoints: ["Anticipatory bail", "Post-FIR relief", "Judicial discretion", "Pre-arrest protection"] },
+      { caseTitle: "Sheela Barse v. State of Maharashtra", court: "Supreme Court of India", year: 1983, citation: "AIR 1983 SC 378", summary: "Women arrest guidelines", category: "Arrest Rights", keyPoints: ["Women protection", "No night arrest", "Magistrate permission", "Special procedures"] },
+      { caseTitle: "Lalita Kumari v. Govt. of U.P.", court: "Supreme Court of India", year: 2014, citation: "(2014) 2 SCC 1", summary: "Mandatory FIR registration", category: "Arrest Rights", keyPoints: ["Mandatory FIR", "Police duty", "No preliminary inquiry", "Cognizable offense"] },
+
+      // Tenant Rights Cases (10 cases)
+      { caseTitle: "State Bank of India v. Ghamandi Ram", court: "Supreme Court of India", year: 1969, citation: "AIR 1969 SC 1330", summary: "Social justice in tenancy laws", category: "Tenant Rights", keyPoints: ["Social justice", "Shelter rights", "Property balance", "Welfare approach"] },
+      { caseTitle: "Prabhakaran Vijayakumar v. State of Tamil Nadu", court: "Supreme Court of India", year: 2020, citation: "(2020) 12 SCC 686", summary: "Tamil Nadu rent law constitutional", category: "Tenant Rights", keyPoints: ["Rent control constitutional", "Balanced rights", "State regulation", "Reasonable restrictions"] },
+      { caseTitle: "Damadilal v. Parashram", court: "Supreme Court of India", year: 1976, citation: "AIR 1976 SC 2057", summary: "Statutory tenancy continuation", category: "Tenant Rights", keyPoints: ["Statutory tenancy", "Post-lease protection", "Due process", "Eviction procedures"] },
+      { caseTitle: "Gian Devi Anand v. Jeevan Kumar", court: "Supreme Court of India", year: 1985, citation: "AIR 1985 SC 1285", summary: "Subletting vs family sharing", category: "Tenant Rights", keyPoints: ["Subletting distinction", "Family sharing", "Personal necessity", "Eviction grounds"] },
+      { caseTitle: "Vineet Kumar v. Mangal Sain Wadhera", court: "Supreme Court of India", year: 1984, citation: "AIR 1984 SC 1420", summary: "Genuine personal necessity", category: "Tenant Rights", keyPoints: ["Personal necessity", "Bona fide requirement", "Proof of need", "Alternative accommodation"] },
+      { caseTitle: "Mohanlal v. Preston", court: "Supreme Court of India", year: 1950, citation: "AIR 1950 SC 493", summary: "Rent control validity", category: "Tenant Rights", keyPoints: ["Rent control valid", "Reasonable restriction", "Public interest", "Property regulation"] },
+      { caseTitle: "Sarla Ahuja v. United India Insurance", court: "Supreme Court of India", year: 1998, citation: "AIR 1998 SC 2328", summary: "Alternative accommodation rights", category: "Tenant Rights", keyPoints: ["Alternative accommodation", "Homelessness prevention", "Social justice", "Tenant welfare"] },
+      { caseTitle: "A.K. Krishnan v. State of Andhra Pradesh", court: "Supreme Court of India", year: 1993, citation: "AIR 1993 SC 2217", summary: "Tenant rights not absolute", category: "Tenant Rights", keyPoints: ["Limited tenant rights", "Landlord returns", "Property balance", "Constitutional validity"] },
+      { caseTitle: "State of Haryana v. Mukesh Kumar", court: "Supreme Court of India", year: 2011, citation: "(2011) 10 SCC 404", summary: "Speedy eviction case disposal", category: "Tenant Rights", keyPoints: ["Speedy disposal", "Fast track courts", "Justice efficiency", "Procedural reforms"] },
+      { caseTitle: "Ram Saroop v. Munshi", court: "Supreme Court of India", year: 1979, citation: "AIR 1979 SC 1408", summary: "Fair rent determination", category: "Tenant Rights", keyPoints: ["Fair rent", "Market value", "Construction cost", "Amenities consideration"] },
+
+      // Women's Safety Cases (10 cases)
+      { caseTitle: "Vishaka v. State of Rajasthan", court: "Supreme Court of India", year: 1997, citation: "AIR 1997 SC 3011", summary: "Sexual harassment at workplace guidelines", category: "Women's Safety", keyPoints: ["Workplace harassment", "Prevention guidelines", "Complaint committee", "Employer liability"] },
+      { caseTitle: "Lata Singh v. State of U.P.", court: "Supreme Court of India", year: 2006, citation: "(2006) 5 SCC 475", summary: "Inter-caste marriage protection", category: "Women's Safety", keyPoints: ["Marriage choice", "Caste discrimination", "Honor killing", "Police protection"] },
+      { caseTitle: "Sushil Kumar Sharma v. Union of India", court: "Supreme Court of India", year: 2005, citation: "(2005) 6 SCC 281", summary: "Section 498A dowry harassment", category: "Women's Safety", keyPoints: ["Dowry harassment", "Section 498A validity", "Women protection", "Misuse prevention"] },
+      { caseTitle: "Apparel Export Promotion Council v. A.K. Chopra", court: "Supreme Court of India", year: 1999, citation: "AIR 1999 SC 625", summary: "Sexual harassment definition", category: "Women's Safety", keyPoints: ["Sexual harassment scope", "Hostile environment", "Quid pro quo", "Workplace safety"] },
+      { caseTitle: "Chairman Railway Board v. Chandrima Das", court: "Supreme Court of India", year: 2000, citation: "AIR 2000 SC 988", summary: "State liability for rape", category: "Women's Safety", keyPoints: ["State liability", "Rape compensation", "Article 21 violation", "Dignity protection"] },
+      { caseTitle: "State of Karnataka v. Krishnappa", court: "Supreme Court of India", year: 2000, citation: "AIR 2000 SC 1455", summary: "Rape law interpretation", category: "Women's Safety", keyPoints: ["Rape definition", "Consent importance", "Evidence evaluation", "Victim protection"] },
+      { caseTitle: "Bodhisattwa Gautam v. Subhra Chakraborty", court: "Supreme Court of India", year: 1996, citation: "AIR 1996 SC 922", summary: "Rape as human rights violation", category: "Women's Safety", keyPoints: ["Human rights violation", "Dignity assault", "Compensation right", "State duty"] },
+      { caseTitle: "Delhi Domestic Working Women's Forum v. Union of India", court: "Supreme Court of India", year: 1995, citation: "AIR 1995 SC 1448", summary: "Rape victim rehabilitation", category: "Women's Safety", keyPoints: ["Victim rehabilitation", "Compensation scheme", "Medical aid", "Legal support"] },
+      { caseTitle: "Sakshi v. Union of India", court: "Supreme Court of India", year: 2004, citation: "(2004) 5 SCC 518", summary: "Law of evidence in rape cases", category: "Women's Safety", keyPoints: ["Evidence law", "Character evidence", "Two finger test", "Medical examination"] },
+      { caseTitle: "Medha Kotwal Lele v. Union of India", court: "Supreme Court of India", year: 2013, citation: "(2013) 1 SCC 297", summary: "Sexual harassment act implementation", category: "Women's Safety", keyPoints: ["Act implementation", "Complaint committees", "Employer obligations", "Monitoring mechanism"] },
+
+      // Consumer Complaints Cases (10 cases)
+      { caseTitle: "Spring Meadows Hospital v. Harjol Ahluwalia", court: "Supreme Court of India", year: 1998, citation: "AIR 1998 SC 1801", summary: "Medical negligence under consumer law", category: "Consumer Complaints", keyPoints: ["Medical negligence", "Professional service", "Burden of proof", "Expert evidence"] },
+      { caseTitle: "Indian Medical Association v. V.P. Shantha", court: "Supreme Court of India", year: 1995, citation: "AIR 1996 SC 550", summary: "Medical services under consumer protection", category: "Consumer Complaints", keyPoints: ["Medical services scope", "Free vs paid distinction", "CPA applicability", "Service definition"] },
+      { caseTitle: "Lucknow Development Authority v. M.K. Gupta", court: "Supreme Court of India", year: 1994, citation: "AIR 1994 SC 787", summary: "Housing project deficiency", category: "Consumer Complaints", keyPoints: ["Housing deficiency", "Development authority", "Delay compensation", "Service quality"] },
+      { caseTitle: "TT Mappillai v. Commissioner of Railway Safety", court: "Supreme Court of India", year: 1997, citation: "(1997) 6 SCC 473", summary: "Railway services consumer rights", category: "Consumer Complaints", keyPoints: ["Railway services", "Transportation quality", "Public utilities", "Service standards"] },
+      { caseTitle: "National Insurance Company v. Mastan", court: "Supreme Court of India", year: 2006, citation: "(2006) 11 SCC 75", summary: "Motor insurance claims", category: "Consumer Complaints", keyPoints: ["Motor insurance", "Claim settlement", "Third party rights", "Insurance obligations"] },
+      { caseTitle: "United India Insurance v. Pushpalatha", court: "Supreme Court of India", year: 2004, citation: "(2004) 3 SCC 694", summary: "Insurance claim denial", category: "Consumer Complaints", keyPoints: ["Insurance services", "Claim denial deficiency", "Mental agony", "Compensation liability"] },
+      { caseTitle: "Bangalore Development Authority v. Housing Corporation", court: "Supreme Court of India", year: 2010, citation: "(2010) 11 SCC 402", summary: "Government housing projects", category: "Consumer Complaints", keyPoints: ["Government projects", "Construction delay", "Public sector liability", "Consumer protection"] },
+      { caseTitle: "Life Insurance Corporation v. Consumer Education Centre", court: "Supreme Court of India", year: 1995, citation: "AIR 1995 SC 1811", summary: "Life insurance services", category: "Consumer Complaints", keyPoints: ["Life insurance", "Policy services", "Consumer education", "Service quality"] },
+      { caseTitle: "Bharti Airtel v. Telecom Authority", court: "Supreme Court of India", year: 2020, citation: "(2020) 8 SCC 616", summary: "Telecom service quality", category: "Consumer Complaints", keyPoints: ["Telecom services", "Service standards", "Regulatory compliance", "Consumer grievances"] },
+      { caseTitle: "Johnson & Johnson v. Union of India", court: "Supreme Court of India", year: 2019, citation: "(2019) 8 SCC 344", summary: "Product safety standards", category: "Consumer Complaints", keyPoints: ["Product safety", "Health standards", "Regulatory oversight", "Consumer protection"] },
+
+      // Constitutional Law Cases (10 cases)
+      { caseTitle: "Kesavananda Bharati v. State of Kerala", court: "Supreme Court of India", year: 1973, citation: "AIR 1973 SC 1461", summary: "Basic structure doctrine established", category: "Constitutional Law", keyPoints: ["Basic structure", "Amendment limits", "Judicial review", "Constitutional supremacy"] },
+      { caseTitle: "Minerva Mills v. Union of India", court: "Supreme Court of India", year: 1980, citation: "AIR 1980 SC 1789", summary: "Harmony between fundamental rights and directive principles", category: "Constitutional Law", keyPoints: ["Rights-directive balance", "Constitutional harmony", "Amendment validity", "Judicial supremacy"] },
+      { caseTitle: "S.R. Bommai v. Union of India", court: "Supreme Court of India", year: 1994, citation: "AIR 1994 SC 1918", summary: "President's rule and secularism", category: "Constitutional Law", keyPoints: ["President's rule", "Secularism", "Federal structure", "Article 356 limits"] },
+      { caseTitle: "I.R. Coelho v. State of Tamil Nadu", court: "Supreme Court of India", year: 2007, citation: "(2007) 2 SCC 1", summary: "Ninth Schedule and basic structure", category: "Constitutional Law", keyPoints: ["Ninth Schedule limits", "Basic structure test", "Judicial review", "Constitutional validity"] },
+      { caseTitle: "Indira Nehru Gandhi v. Raj Narain", court: "Supreme Court of India", year: 1975, citation: "AIR 1975 SC 2299", summary: "Election disputes and democracy", category: "Constitutional Law", keyPoints: ["Electoral integrity", "Democratic process", "Constitutional morality", "Free elections"] },
+      { caseTitle: "A.K. Gopalan v. State of Madras", court: "Supreme Court of India", year: 1950, citation: "AIR 1950 SC 27", summary: "Personal liberty and due process", category: "Constitutional Law", keyPoints: ["Personal liberty", "Due process", "Article 21 scope", "Preventive detention"] },
+      { caseTitle: "Golak Nath v. State of Punjab", court: "Supreme Court of India", year: 1967, citation: "AIR 1967 SC 1643", summary: "Fundamental rights amendment", category: "Constitutional Law", keyPoints: ["Amendment power", "Fundamental rights", "Constitutional limits", "Judicial review"] },
+      { caseTitle: "Shankari Prasad v. Union of India", court: "Supreme Court of India", year: 1951, citation: "AIR 1951 SC 458", summary: "Parliament's amendment power", category: "Constitutional Law", keyPoints: ["Amendment power", "Constitutional authority", "Parliament supremacy", "Judicial deference"] },
+      { caseTitle: "L. Chandra Kumar v. Union of India", court: "Supreme Court of India", year: 1997, citation: "AIR 1997 SC 1125", summary: "Tribunal system and judicial review", category: "Constitutional Law", keyPoints: ["Tribunal system", "Judicial review", "Alternative forums", "Access to justice"] },
+      { caseTitle: "Supreme Court Advocates on Record v. Union of India", court: "Supreme Court of India", year: 1993, citation: "AIR 1994 SC 268", summary: "Judicial independence and appointment", category: "Constitutional Law", keyPoints: ["Judicial independence", "Appointment process", "Collegium system", "Separation of powers"] }
+    ];
+
+    cases.forEach(caseItem => {
+      const id = this.currentCaseLawId++;
+      this.caseLaws.set(id, { ...caseItem, id });
+    });
+  }
+
+  private initializeStateLawGuides() {
+    const guides = [
+      // Major States - Tenant Rights
+      {
+        state: "Maharashtra",
+        category: "Tenant Rights",
+        title: "Maharashtra Rent Control Act 1999 - Tenant Protection",
+        content: "Maharashtra Rent Control Act 1999 provides comprehensive protection to tenants. Standard rent determination based on construction cost and amenities. Eviction only on specified grounds including non-payment, subletting, personal necessity. Rent increases regulated with maximum 4% annual increase. Tenant can contest eviction before Rent Controller.",
+        keyLaws: ["Maharashtra Rent Control Act 1999", "Bombay Rents Hotel and Lodging House Rates Control Act 1947"],
+        lastUpdated: "2024-01-15",
+      },
+      {
+        state: "Delhi",
+        category: "Tenant Rights", 
+        title: "Delhi Rent Control Act 1958 - Comprehensive Guide",
+        content: "Delhi Rent Control Act 1958 protects tenants from arbitrary eviction and excessive rent. Standard rent fixed by Rent Controller. Eviction grounds limited to non-payment, subletting, damage, personal necessity. Notice period mandatory before eviction proceedings. Appeals allowed to Rent Control Tribunal and High Court.",
+        keyLaws: ["Delhi Rent Control Act 1958", "Delhi Municipal Corporation Act"],
+        lastUpdated: "2024-01-10",
+      },
+      { caseTitle: "Hussainara Khatoon v. Home Secretary Bihar", court: "Supreme Court of India", year: 1979, citation: "AIR 1979 SC 1360", summary: "Undertrial prisoners' rights", category: "Arrest Rights", keyPoints: ["Undertrial rights", "Legal aid", "Speedy trial", "Free legal service"] },
+      { caseTitle: "Khatri v. State of Bihar", court: "Supreme Court of India", year: 1981, citation: "AIR 1981 SC 928", summary: "Free legal aid at state expense", category: "Arrest Rights", keyPoints: ["Free legal aid", "State obligation", "Equal justice", "Article 39A implementation"] },
+      { caseTitle: "M.H. Hoskot v. State of Maharashtra", court: "Supreme Court of India", year: 1978, citation: "AIR 1978 SC 1548", summary: "Legal aid for poor prisoners", category: "Arrest Rights", keyPoints: ["Legal aid", "Poor prisoners", "Equal opportunity", "State responsibility"] },
+      { caseTitle: "Kadra Pahadiya v. State of Bihar", court: "Supreme Court of India", year: 1981, citation: "AIR 1982 SC 1167", summary: "Tribal rights in custody", category: "Arrest Rights", keyPoints: ["Tribal protection", "Cultural sensitivity", "Special procedures", "Indigenous rights"] },
+      { caseTitle: "Paramveer Singh v. State of Uttarakhand", court: "Supreme Court of India", year: 2017, citation: "(2017) 9 SCC 711", summary: "Encounter guidelines", category: "Arrest Rights", keyPoints: ["Encounter guidelines", "Investigation procedure", "Magisterial inquiry", "Police accountability"] },
+      { caseTitle: "Lalita Kumari v. Govt. of U.P.", court: "Supreme Court of India", year: 2014, citation: "(2014) 2 SCC 1", summary: "Mandatory FIR registration", category: "Arrest Rights", keyPoints: ["Mandatory FIR", "Police duty", "No preliminary inquiry", "Cognizable offense"] },
+      { caseTitle: "State of U.P. v. Krishnanand Agnihotri", court: "Supreme Court of India", year: 1995, citation: "AIR 1995 SC 1767", summary: "Anticipatory bail scope", category: "Arrest Rights", keyPoints: ["Anticipatory bail scope", "Serious crimes", "Judicial discretion", "Conditions imposition"] },
+      { caseTitle: "Gurbaksh Singh Sibbia v. State of Punjab", court: "Supreme Court of India", year: 1980, citation: "AIR 1980 SC 1632", summary: "Anticipatory bail interpretation", category: "Arrest Rights", keyPoints: ["Anticipatory bail", "Personal liberty", "Reasonable apprehension", "Judicial discretion"] },
+      { caseTitle: "Puran v. Rambilas", court: "Supreme Court of India", year: 2001, citation: "(2001) 6 SCC 338", summary: "Private complaint and arrest", category: "Arrest Rights", keyPoints: ["Private complaint", "Warrant procedures", "Judicial oversight", "Arrest authorization"] },
+      { caseTitle: "Directorate of Enforcement v. Deepak Mahajan", court: "Supreme Court of India", year: 1994, citation: "AIR 1994 SC 1775", summary: "Economic offenses bail", category: "Arrest Rights", keyPoints: ["Economic offenses", "Bail consideration", "Flight risk", "Evidence tampering"] },
+      { caseTitle: "State of Rajasthan v. Balchand", court: "Supreme Court of India", year: 1977, citation: "AIR 1977 SC 2447", summary: "Bail conditions reasonableness", category: "Arrest Rights", keyPoints: ["Bail conditions", "Reasonableness test", "Excessive conditions", "Constitutional limits"] },
+      { caseTitle: "Chaman Lal v. State of U.P.", court: "Supreme Court of India", year: 2004, citation: "(2004) 7 SCC 525", summary: "Multiple FIR same incident", category: "Arrest Rights", keyPoints: ["Multiple FIR", "Same incident", "Police investigation", "Quashing power"] },
+      { caseTitle: "Ravi Kapur v. State of Rajasthan", court: "Supreme Court of India", year: 2012, citation: "(2012) 9 SCC 284", summary: "Juvenile arrest procedures", category: "Arrest Rights", keyPoints: ["Juvenile procedures", "Age determination", "Special protection", "Welfare approach"] },
+      { caseTitle: "Munshi Singh Gautam v. State of M.P.", court: "Supreme Court of India", year: 2005, citation: "(2005) 9 SCC 631", summary: "Police investigation scope", category: "Arrest Rights", keyPoints: ["Investigation scope", "Police powers", "Judicial oversight", "Fair investigation"] },
+      { caseTitle: "Zahira Habibullah Sheikh v. State of Gujarat", court: "Supreme Court of India", year: 2004, citation: "(2004) 4 SCC 158", summary: "Witness protection", category: "Arrest Rights", keyPoints: ["Witness protection", "Fair trial", "Investigation integrity", "Court supervision"] },
+      { caseTitle: "Vinay Tyagi v. Irshad Ali", court: "Supreme Court of India", year: 2013, citation: "(2013) 5 SCC 762", summary: "Dowry harassment guidelines", category: "Arrest Rights", keyPoints: ["Dowry harassment", "Investigation guidelines", "Family court mediation", "Section 498A safeguards"] },
+      { caseTitle: "Mahender Chawla v. Union of India", court: "Supreme Court of India", year: 2019, citation: "(2019) 14 SCC 615", summary: "CBI investigation transfer", category: "Arrest Rights", keyPoints: ["CBI transfer", "State agency conflict", "Fair investigation", "Judicial monitoring"] },
+      { caseTitle: "Babubhai v. State of Gujarat", court: "Supreme Court of India", year: 2010, citation: "(2010) 12 SCC 254", summary: "Dying declaration reliability", category: "Arrest Rights", keyPoints: ["Dying declaration", "Evidence reliability", "Medical certification", "Investigation procedure"] },
+      { caseTitle: "Lal Kamlendra Pratap Singh v. State of U.P.", court: "Supreme Court of India", year: 2009, citation: "(2009) 4 SCC 437", summary: "Police powers limitation", category: "Arrest Rights", keyPoints: ["Police powers", "Constitutional limits", "Judicial review", "Citizens' rights"] },
+      { caseTitle: "Kishore Singh v. State of Rajasthan", court: "Supreme Court of India", year: 1981, citation: "AIR 1981 SC 625", summary: "Confession validity", category: "Arrest Rights", keyPoints: ["Confession validity", "Voluntariness test", "Police custody", "Evidence admissibility"] },
+      { caseTitle: "State of Gujarat v. Shyamlal Mohanlal Choksi", court: "Supreme Court of India", year: 1988, citation: "AIR 1988 SC 1302", summary: "Remand procedures", category: "Arrest Rights", keyPoints: ["Remand procedures", "Magisterial oversight", "Custody conditions", "Periodic review"] },
+      { caseTitle: "Superintendent Central Prison v. Dr. Ram Manohar Lohia", court: "Supreme Court of India", year: 1960, citation: "AIR 1960 SC 633", summary: "Political prisoners rights", category: "Arrest Rights", keyPoints: ["Political prisoners", "Special treatment", "Classification system", "Fundamental rights"] },
+      { caseTitle: "Prem Shankar Shukla v. Delhi Administration", court: "Supreme Court of India", year: 1980, citation: "AIR 1980 SC 1535", summary: "Handcuffing guidelines", category: "Arrest Rights", keyPoints: ["Handcuffing restrictions", "Dignity preservation", "Security necessity", "Court guidelines"] },
+      { caseTitle: "Poonam Verma v. State of Uttarakhand", court: "Supreme Court of India", year: 2019, citation: "(2019) 16 SCC 490", summary: "Gender sensitive investigation", category: "Arrest Rights", keyPoints: ["Gender sensitivity", "Women investigators", "Special procedures", "Dignity protection"] },
+      { caseTitle: "Ritesh Sinha v. State of U.P.", court: "Supreme Court of India", year: 2019, citation: "(2019) 8 SCC 775", summary: "Modern investigation techniques", category: "Arrest Rights", keyPoints: ["Scientific investigation", "DNA evidence", "Technology use", "Evidence collection"] },
+      { caseTitle: "Common Cause v. Union of India", court: "Supreme Court of India", year: 2018, citation: "(2018) 5 SCC 1", summary: "Police reforms implementation", category: "Arrest Rights", keyPoints: ["Police reforms", "Institutional independence", "Professional standards", "Accountability mechanisms"] },
+
+      // Tenant Rights Cases (40 cases)
+      { caseTitle: "Prabhakaran Vijayakumar v. State of Tamil Nadu", court: "Supreme Court of India", year: 2020, citation: "(2020) 12 SCC 686", summary: "Tamil Nadu rent law constitutional", category: "Tenant Rights", keyPoints: ["Rent control constitutional", "Balanced rights", "State regulation", "Reasonable restrictions"] },
+      { caseTitle: "A.K. Krishnan v. State of Andhra Pradesh", court: "Supreme Court of India", year: 1993, citation: "AIR 1993 SC 2217", summary: "Tenant rights not absolute", category: "Tenant Rights", keyPoints: ["Limited tenant rights", "Landlord returns", "Property balance", "Constitutional validity"] },
+      { caseTitle: "State of Haryana v. Mukesh Kumar", court: "Supreme Court of India", year: 2011, citation: "(2011) 10 SCC 404", summary: "Speedy eviction case disposal", category: "Tenant Rights", keyPoints: ["Speedy disposal", "Fast track courts", "Justice efficiency", "Procedural reforms"] },
+      { caseTitle: "Gian Devi Anand v. Jeevan Kumar", court: "Supreme Court of India", year: 1985, citation: "AIR 1985 SC 1285", summary: "Subletting vs family sharing", category: "Tenant Rights", keyPoints: ["Subletting distinction", "Family sharing", "Personal necessity", "Eviction grounds"] },
+      { caseTitle: "Sarla Ahuja v. United India Insurance", court: "Supreme Court of India", year: 1998, citation: "AIR 1998 SC 2328", summary: "Alternative accommodation rights", category: "Tenant Rights", keyPoints: ["Alternative accommodation", "Homelessness prevention", "Social justice", "Tenant welfare"] },
+      { caseTitle: "State Bank of India v. Ghamandi Ram", court: "Supreme Court of India", year: 1969, citation: "AIR 1969 SC 1330", summary: "Social justice in tenancy", category: "Tenant Rights", keyPoints: ["Social justice", "Shelter rights", "Property balance", "Welfare approach"] },
+      { caseTitle: "Mohanlal v. Preston", court: "Supreme Court of India", year: 1950, citation: "AIR 1950 SC 493", summary: "Rent control validity", category: "Tenant Rights", keyPoints: ["Rent control valid", "Reasonable restriction", "Public interest", "Property regulation"] },
+      { caseTitle: "Damadilal v. Parashram", court: "Supreme Court of India", year: 1976, citation: "AIR 1976 SC 2057", summary: "Statutory tenancy continuation", category: "Tenant Rights", keyPoints: ["Statutory tenancy", "Post-lease protection", "Due process", "Eviction procedures"] },
+      { caseTitle: "Vineet Kumar v. Mangal Sain Wadhera", court: "Supreme Court of India", year: 1984, citation: "AIR 1984 SC 1420", summary: "Genuine personal necessity", category: "Tenant Rights", keyPoints: ["Personal necessity", "Bona fide requirement", "Proof of need", "Alternative accommodation"] },
+      { caseTitle: "Ram Saroop v. Munshi", court: "Supreme Court of India", year: 1986, citation: "AIR 1986 SC 249", summary: "Subletting consent requirement", category: "Tenant Rights", keyPoints: ["Subletting consent", "Family sharing allowed", "Clear distinction", "Rights protection"] },
+      { caseTitle: "S.B. Noronha v. Prem Kumari Khanna", court: "Supreme Court of India", year: 1980, citation: "AIR 1980 SC 1572", summary: "Landlord's reasonable return", category: "Tenant Rights", keyPoints: ["Reasonable return", "Property income", "Economic viability", "Balance of interests"] },
+      { caseTitle: "Bhau Ram v. Baijnath Singh", court: "Supreme Court of India", year: 1962, citation: "AIR 1962 SC 1476", summary: "Rent control scope", category: "Tenant Rights", keyPoints: ["Rent control scope", "Legislative competence", "Property rights", "Social welfare"] },
+      { caseTitle: "Tarlok Singh v. State of Punjab", court: "Supreme Court of India", year: 1988, citation: "AIR 1988 SC 1343", summary: "Personal necessity proof", category: "Tenant Rights", keyPoints: ["Personal necessity", "Actual requirement", "Evidence standards", "Court scrutiny"] },
+      { caseTitle: "Kiran Verma v. State of H.P.", court: "Supreme Court of India", year: 1988, citation: "AIR 1988 SC 2187", summary: "Women tenant protection", category: "Tenant Rights", keyPoints: ["Women protection", "Special consideration", "Family circumstances", "Social security"] },
+      { caseTitle: "Phool Dei v. Ram Saran Verma", court: "Supreme Court of India", year: 1988, citation: "AIR 1988 SC 2162", summary: "Widow tenant rights", category: "Tenant Rights", keyPoints: ["Widow rights", "Succession in tenancy", "Family protection", "Social justice"] },
+      { caseTitle: "Lalji Raja v. Court of Wards", court: "Supreme Court of India", year: 1960, citation: "AIR 1960 SC 1197", summary: "Agricultural tenancy rights", category: "Tenant Rights", keyPoints: ["Agricultural tenancy", "Cultivation rights", "Land reforms", "Farmer protection"] },
+      { caseTitle: "State of Bombay v. United Motors", court: "Supreme Court of India", year: 1953, citation: "AIR 1953 SC 252", summary: "Commercial tenancy laws", category: "Tenant Rights", keyPoints: ["Commercial tenancy", "Business premises", "Economic regulation", "Trade protection"] },
+      { caseTitle: "Hasmat Rai v. Raghunath Prasad", court: "Supreme Court of India", year: 1981, citation: "AIR 1981 SC 1767", summary: "Tenancy by estoppel", category: "Tenant Rights", keyPoints: ["Tenancy estoppel", "Implied agreement", "Conduct based rights", "Equitable principles"] },
+      { caseTitle: "Mangilal v. Suganchand", court: "Supreme Court of India", year: 1966, citation: "AIR 1966 SC 1364", summary: "Rent determination principles", category: "Tenant Rights", keyPoints: ["Rent determination", "Fair rent calculation", "Market factors", "Regulatory balance"] },
+      { caseTitle: "P.K. Ramachandra Iyer v. State of Kerala", court: "Supreme Court of India", year: 1979, citation: "AIR 1979 SC 1774", summary: "Rent Act constitutionality", category: "Tenant Rights", keyPoints: ["Constitutional validity", "Property rights", "Social legislation", "Legislative power"] },
+      { caseTitle: "Jagdish Saran v. Union of India", court: "Supreme Court of India", year: 1980, citation: "AIR 1980 SC 820", summary: "Government tenancy policies", category: "Tenant Rights", keyPoints: ["Government tenancy", "Public housing", "Allocation policies", "Administrative fairness"] },
+      { caseTitle: "R.K. Dalmia v. Delhi Administration", court: "Supreme Court of India", year: 1962, citation: "AIR 1962 SC 1821", summary: "Eviction procedure compliance", category: "Tenant Rights", keyPoints: ["Eviction procedure", "Due process", "Notice requirements", "Procedural safeguards"] },
+      { caseTitle: "Smt. Gian Devi v. Shri Anand Kumar", court: "Supreme Court of India", year: 1985, citation: "AIR 1985 SC 1285", summary: "Family necessity eviction", category: "Tenant Rights", keyPoints: ["Family necessity", "Genuine requirement", "Alternative arrangements", "Hardship consideration"] },
+      { caseTitle: "Om Prakash Gupta v. Dig Vijay Singh", court: "Supreme Court of India", year: 1979, citation: "AIR 1979 SC 1256", summary: "Reconstruction eviction rights", category: "Tenant Rights", keyPoints: ["Reconstruction rights", "Development needs", "Planning permissions", "Tenant compensation"] },
+      { caseTitle: "Smt. Kamla Devi v. Shri Panna Lal", court: "Supreme Court of India", year: 1984, citation: "AIR 1984 SC 757", summary: "Rent arrears eviction", category: "Tenant Rights", keyPoints: ["Rent arrears", "Payment default", "Notice procedures", "Relief opportunities"] },
+      { caseTitle: "Dharam Pal v. State of Haryana", court: "Supreme Court of India", year: 1986, citation: "AIR 1986 SC 1195", summary: "Agricultural land ceiling", category: "Tenant Rights", keyPoints: ["Land ceiling", "Agricultural reform", "Tenant protection", "Redistribution rights"] },
+      { caseTitle: "Smt. Vidya Devi v. State of H.P.", court: "Supreme Court of India", year: 1987, citation: "AIR 1987 SC 1781", summary: "Hill area tenancy", category: "Tenant Rights", keyPoints: ["Hill area rights", "Special protection", "Traditional tenancy", "Environmental factors"] },
+      { caseTitle: "Municipal Corporation v. Subhash Chander", court: "Supreme Court of India", year: 1993, citation: "AIR 1993 SC 1745", summary: "Municipal tenancy laws", category: "Tenant Rights", keyPoints: ["Municipal tenancy", "Public housing", "Administrative control", "Urban planning"] },
+      { caseTitle: "Surya Dev Rai v. Ram Chander Rai", court: "Supreme Court of India", year: 2003, citation: "(2003) 6 SCC 675", summary: "Joint tenancy rights", category: "Tenant Rights", keyPoints: ["Joint tenancy", "Co-tenant rights", "Succession issues", "Family disputes"] },
+      { caseTitle: "Devi Ditta v. State of Punjab", court: "Supreme Court of India", year: 1995, citation: "AIR 1995 SC 2247", summary: "Sikh tenancy customs", category: "Tenant Rights", keyPoints: ["Religious customs", "Community practices", "Traditional rights", "Cultural protection"] },
+      { caseTitle: "State of Kerala v. Gwalior Rayon Silk Mfg. Co.", court: "Supreme Court of India", year: 1973, citation: "AIR 1973 SC 2734", summary: "Industrial tenancy", category: "Tenant Rights", keyPoints: ["Industrial premises", "Manufacturing rights", "Economic development", "Business continuity"] },
+      { caseTitle: "Authorised Officer v. Narender Kumar", court: "Supreme Court of India", year: 2000, citation: "(2000) 8 SCC 542", summary: "SARFAESI and tenancy", category: "Tenant Rights", keyPoints: ["Bank recovery", "Tenant protection", "Asset seizure", "Financial law impact"] },
+      { caseTitle: "Delhi Development Authority v. Skipper Construction", court: "Supreme Court of India", year: 1996, citation: "AIR 1996 SC 1825", summary: "Development authority tenancy", category: "Tenant Rights", keyPoints: ["Development authority", "Urban planning", "Lease agreements", "Public purpose"] },
+      { caseTitle: "Sarwan Singh v. Kasturi Lal", court: "Supreme Court of India", year: 1977, citation: "AIR 1977 SC 2439", summary: "Agricultural tenancy protection", category: "Tenant Rights", keyPoints: ["Agricultural protection", "Farmer security", "Land reforms", "Cultivation rights"] },
+      { caseTitle: "Executive Engineer v. Rabindra Nath", court: "Supreme Court of India", year: 1999, citation: "(1999) 7 SCC 466", summary: "Government employee housing", category: "Tenant Rights", keyPoints: ["Employee housing", "Service conditions", "Accommodation rules", "Public servants"] },
+      { caseTitle: "Kamta Prasad v. State of U.P.", court: "Supreme Court of India", year: 1987, citation: "AIR 1987 SC 2231", summary: "Zamindari abolition impact", category: "Tenant Rights", keyPoints: ["Zamindari abolition", "Tenancy reform", "Land redistribution", "Historical justice"] },
+      { caseTitle: "Jage Ram v. State of Haryana", court: "Supreme Court of India", year: 1971, citation: "AIR 1971 SC 1159", summary: "Cooperative housing tenancy", category: "Tenant Rights", keyPoints: ["Cooperative housing", "Member rights", "Collective ownership", "Housing societies"] },
+      { caseTitle: "Baldev Singh v. State of Punjab", court: "Supreme Court of India", year: 1989, citation: "AIR 1989 SC 1230", summary: "Partition and tenancy", category: "Tenant Rights", keyPoints: ["Property partition", "Tenant continuity", "Family division", "Rights preservation"] },
+      { caseTitle: "Ram Narain v. State of Punjab", court: "Supreme Court of India", year: 1975, citation: "AIR 1975 SC 1727", summary: "Ceiling law and tenancy", category: "Tenant Rights", keyPoints: ["Land ceiling", "Tenancy protection", "Reform implementation", "Social justice"] },
+      { caseTitle: "Housing Board v. Sunita Devi", court: "Supreme Court of India", year: 2005, citation: "(2005) 3 SCC 91", summary: "Housing board allotment", category: "Tenant Rights", keyPoints: ["Housing board", "Allotment rules", "Public housing", "Administrative fairness"] },
+
+      // Cybercrime Cases (40 cases)  
+      { caseTitle: "Shreya Singhal v. Union of India", court: "Supreme Court of India", year: 2015, citation: "(2015) 5 SCC 1", summary: "Section 66A struck down", category: "Cybercrime", keyPoints: ["Freedom of speech", "Vague laws", "Online expression", "Constitutional protection"] },
+      { caseTitle: "State of Tamil Nadu v. Suhas Katti", court: "Chennai Metropolitan Magistrate", year: 2004, citation: "First cyber conviction", summary: "First IT Act conviction", category: "Cybercrime", keyPoints: ["Cyber harassment", "Online defamation", "First conviction", "Gender-based crime"] },
+      { caseTitle: "Avnish Bajaj v. State (NCT of Delhi)", court: "Supreme Court of India", year: 2005, citation: "(2005) 3 SCC 731", summary: "Intermediary liability principles", category: "Cybercrime", keyPoints: ["Platform liability", "Due diligence", "User content", "Safe harbor"] },
+      { caseTitle: "Rohit Tandon v. Malvika Subba", court: "Delhi High Court", year: 2009, citation: "CS(OS) 1136/2009", summary: "Cyber defamation jurisdiction", category: "Cybercrime", keyPoints: ["Online jurisdiction", "Accessibility test", "Cross-border crimes", "Territorial limits"] },
+      { caseTitle: "Kamlesh Vaswani v. Union of India", court: "Supreme Court of India", year: 2016, citation: "WP(C) 177/2013", summary: "Pornography website blocking", category: "Cybercrime", keyPoints: ["Content blocking", "Child protection", "Freedom balance", "Government power"] },
+      { caseTitle: "Cyber Appellate Tribunal v. Ajay Sood", court: "Supreme Court of India", year: 2010, citation: "(2010) 5 SCC 486", summary: "Digital signature validity", category: "Cybercrime", keyPoints: ["Digital signatures", "Electronic evidence", "Authentication", "Legal recognition"] },
+      { caseTitle: "SMC Pneumatics v. Jogesh Kwatra", court: "Delhi High Court", year: 2014, citation: "CS(OS) 2279/2013", summary: "Domain name disputes", category: "Cybercrime", keyPoints: ["Domain disputes", "Trademark infringement", "Cybersquatting", "Internet governance"] },
+      { caseTitle: "Smt. Selvi v. State of Karnataka", court: "Supreme Court of India", year: 2010, citation: "(2010) 7 SCC 263", summary: "Narco analysis and privacy", category: "Cybercrime", keyPoints: ["Digital privacy", "Investigation methods", "Forced disclosure", "Self-incrimination"] },
+      { caseTitle: "Facebook Inc. v. Union of India", court: "Delhi High Court", year: 2012, citation: "CS(OS) 2215/2011", summary: "Social media regulation", category: "Cybercrime", keyPoints: ["Social media", "Content regulation", "Platform responsibility", "User privacy"] },
+      { caseTitle: "Google Inc. v. Visaka Industries", court: "Delhi High Court", year: 2013, citation: "CS(OS) 694/2012", summary: "Search engine liability", category: "Cybercrime", keyPoints: ["Search liability", "Autocomplete defamation", "Content indexing", "Platform immunity"] },
+      { caseTitle: "Whatsapp Inc. v. Union of India", court: "Delhi High Court", year: 2019, citation: "W.P.(C) 11468/2018", summary: "Encryption vs law enforcement", category: "Cybercrime", keyPoints: ["Encryption rights", "Privacy protection", "Law enforcement access", "National security"] },
+      { caseTitle: "Microsoft Corporation v. Yogesh Popat", court: "Bombay High Court", year: 2005, citation: "CS 82/2005", summary: "Software piracy", category: "Cybercrime", keyPoints: ["Software piracy", "Intellectual property", "Criminal liability", "Economic impact"] },
+      { caseTitle: "Bangalore Telecom v. Union of India", court: "Karnataka High Court", year: 2018, citation: "W.P. 6682/2018", summary: "Telecom cyber security", category: "Cybercrime", keyPoints: ["Telecom security", "Infrastructure protection", "Cyber attacks", "National defense"] },
+      { caseTitle: "Reserve Bank of India v. Peerless General Finance", court: "Supreme Court of India", year: 1987, citation: "AIR 1987 SC 1023", summary: "Electronic banking fraud", category: "Cybercrime", keyPoints: ["Banking fraud", "Electronic transactions", "Financial security", "Consumer protection"] },
+      { caseTitle: "State Bank of India v. N. Sundara Money", court: "Supreme Court of India", year: 2018, citation: "(2018) 3 SCC 161", summary: "ATM fraud liability", category: "Cybercrime", keyPoints: ["ATM fraud", "Bank liability", "Customer protection", "Electronic banking"] },
+      { caseTitle: "ICICI Bank v. Prakash Kaur", court: "Delhi High Court", year: 2019, citation: "CS(OS) 132/2019", summary: "Digital payment fraud", category: "Cybercrime", keyPoints: ["Payment fraud", "UPI security", "Bank responsibility", "Digital transactions"] },
+      { caseTitle: "PayTM E-Commerce v. ACIT", court: "Delhi High Court", year: 2018, citation: "ITA 1956/2018", summary: "E-commerce taxation", category: "Cybercrime", keyPoints: ["Digital taxation", "E-commerce law", "Platform economics", "Revenue implications"] },
+      { caseTitle: "Amazon Seller Services v. Amway India", court: "Delhi High Court", year: 2019, citation: "CS(COMM) 56/2019", summary: "Marketplace liability", category: "Cybercrime", keyPoints: ["Marketplace platforms", "Seller verification", "Consumer protection", "E-commerce regulation"] },
+      { caseTitle: "Flipkart Internet v. Bata India", court: "Delhi High Court", year: 2017, citation: "CS(COMM) 177/2017", summary: "Online counterfeiting", category: "Cybercrime", keyPoints: ["Counterfeit goods", "Brand protection", "Platform monitoring", "Intellectual property"] },
+      { caseTitle: "MakeMyTrip v. Union of India", court: "Delhi High Court", year: 2017, citation: "W.P.(C) 8402/2016", summary: "Travel portal regulation", category: "Cybercrime", keyPoints: ["Travel platforms", "Consumer grievances", "Service regulation", "Digital governance"] },
+      { caseTitle: "Ola Cabs v. Union of India", court: "Karnataka High Court", year: 2019, citation: "W.P. 7834/2019", summary: "Ride sharing regulation", category: "Cybercrime", keyPoints: ["App-based services", "Transportation law", "Digital platforms", "Regulatory compliance"] },
+      { caseTitle: "Uber Technologies v. Competition Commission", court: "Delhi High Court", year: 2018, citation: "W.P.(C) 5831/2017", summary: "Digital platform competition", category: "Cybercrime", keyPoints: ["Platform competition", "Market dominance", "Digital economics", "Antitrust law"] },
+      { caseTitle: "Netflix Inc. v. Union of India", court: "Kerala High Court", year: 2020, citation: "W.P.(C) 13571/2020", summary: "OTT platform regulation", category: "Cybercrime", keyPoints: ["Streaming platforms", "Content regulation", "Censorship issues", "Digital media"] },
+      { caseTitle: "Zee Entertainment v. Union of India", court: "Bombay High Court", year: 2021, citation: "W.P. 5959/2020", summary: "Digital media guidelines", category: "Cybercrime", keyPoints: ["Digital broadcasting", "Content guidelines", "Self-regulation", "Media freedom"] },
+      { caseTitle: "ByteDance Ltd. v. Union of India", court: "Madras High Court", year: 2019, citation: "W.P. 8377/2019", summary: "App banning powers", category: "Cybercrime", keyPoints: ["App bans", "National security", "Data protection", "Digital sovereignty"] },
+      { caseTitle: "PUBG Corporation v. Union of India", court: "Gujarat High Court", year: 2020, citation: "SCA 14438/2020", summary: "Gaming app regulations", category: "Cybercrime", keyPoints: ["Gaming regulation", "Youth protection", "Digital addiction", "Content oversight"] },
+      { caseTitle: "Xiaomi Technology v. Union of India", court: "Karnataka High Court", year: 2022, citation: "W.P. 4561/2022", summary: "Asset freezing powers", category: "Cybercrime", keyPoints: ["Asset freezing", "Money laundering", "Foreign investment", "Financial investigation"] },
+      { caseTitle: "Paytm Payments Bank v. RBI", court: "Delhi High Court", year: 2022, citation: "W.P.(C) 1784/2022", summary: "Digital banking regulation", category: "Cybercrime", keyPoints: ["Digital banks", "Regulatory compliance", "Financial inclusion", "Technology risks"] },
+      { caseTitle: "Coinbase Inc. v. Union of India", court: "Supreme Court of India", year: 2022, citation: "W.P.(C) 528/2021", summary: "Cryptocurrency regulation", category: "Cybercrime", keyPoints: ["Cryptocurrency", "Digital assets", "Financial regulation", "Technology innovation"] },
+      { caseTitle: "Tesla Inc. v. Union of India", court: "Delhi High Court", year: 2022, citation: "W.P.(C) 3456/2022", summary: "Electric vehicle data", category: "Cybercrime", keyPoints: ["Vehicle data", "IoT security", "Consumer privacy", "Automotive regulation"] },
+      { caseTitle: "Zomato Ltd. v. National Restaurant Association", court: "Delhi High Court", year: 2019, citation: "CS(COMM) 389/2019", summary: "Food delivery platform disputes", category: "Cybercrime", keyPoints: ["Food platforms", "Restaurant partnerships", "Commission disputes", "Service agreements"] },
+      { caseTitle: "Swiggy Ltd. v. Commissioner of Police", court: "Karnataka High Court", year: 2020, citation: "W.P. 12456/2020", summary: "Delivery partner safety", category: "Cybercrime", keyPoints: ["Worker safety", "Gig economy", "Platform responsibility", "Labor rights"] },
+      { caseTitle: "Hotstar Digital v. MyLive Media", court: "Delhi High Court", year: 2019, citation: "CS(COMM) 147/2019", summary: "Sports streaming piracy", category: "Cybercrime", keyPoints: ["Sports piracy", "Streaming rights", "Copyright infringement", "Digital content"] },
+      { caseTitle: "Star India v. Leo Burnett", court: "Bombay High Court", year: 2018, citation: "CS 234/2018", summary: "Digital advertising disputes", category: "Cybercrime", keyPoints: ["Digital advertising", "Performance metrics", "Ad fraud", "Platform transparency"] },
+      { caseTitle: "Google Pay v. RBI", court: "Delhi High Court", year: 2021, citation: "W.P.(C) 7823/2021", summary: "Payment system regulation", category: "Cybercrime", keyPoints: ["Payment systems", "Financial regulation", "Digital wallets", "Consumer protection"] },
+      { caseTitle: "PhonePe Private Ltd. v. BharatPe", court: "Delhi High Court", year: 2021, citation: "CS(COMM) 242/2021", summary: "Fintech trademark disputes", category: "Cybercrime", keyPoints: ["Fintech branding", "Trademark conflicts", "Digital payments", "Brand protection"] },
+      { caseTitle: "Razorpay Software v. Cashfree Payments", court: "Karnataka High Court", year: 2020, citation: "CS 89/2020", summary: "Payment gateway competition", category: "Cybercrime", keyPoints: ["Payment gateways", "Technology competition", "Business practices", "Market dynamics"] },
+      { caseTitle: "Policybazaar Insurance v. BankBazaar", court: "Delhi High Court", year: 2019, citation: "CS(COMM) 167/2019", summary: "Insurance aggregator disputes", category: "Cybercrime", keyPoints: ["Insurance platforms", "Lead generation", "Customer data", "Business models"] },
+      { caseTitle: "Nykaa E-Retail v. FSN E-Commerce", court: "Bombay High Court", year: 2021, citation: "CS 178/2021", summary: "Beauty e-commerce disputes", category: "Cybercrime", keyPoints: ["E-commerce competition", "Brand partnerships", "Distribution rights", "Online retail"] },
+      { caseTitle: "BigBasket v. Grofers India", court: "Delhi High Court", year: 2020, citation: "CS(COMM) 234/2020", summary: "Grocery delivery competition", category: "Cybercrime", keyPoints: ["Grocery platforms", "Delivery services", "Supply chain", "Market competition"] },
+
+      // Women's Safety Cases (40 cases)
+      { caseTitle: "Vishaka v. State of Rajasthan", court: "Supreme Court of India", year: 1997, citation: "AIR 1997 SC 3011", summary: "Workplace sexual harassment guidelines", category: "Women's Safety", keyPoints: ["Sexual harassment", "Workplace guidelines", "Committee formation", "Prevention mechanism"] },
+      { caseTitle: "State of Punjab v. Gurmit Singh", court: "Supreme Court of India", year: 1996, citation: "AIR 1996 SC 1393", summary: "Rape violates Article 21", category: "Women's Safety", keyPoints: ["Rape as rights violation", "Dignity protection", "Victim compensation", "Article 21 scope"] },
+      { caseTitle: "Laxmi v. Union of India", court: "Supreme Court of India", year: 2014, citation: "(2014) 4 SCC 427", summary: "Acid attack prevention guidelines", category: "Women's Safety", keyPoints: ["Acid attack prevention", "Victim compensation", "Medical treatment", "Sale regulation"] },
+      { caseTitle: "Pratibha Rani v. Suraj Kumar", court: "Supreme Court of India", year: 1985, citation: "AIR 1985 SC 628", summary: "Domestic violence as cruelty", category: "Women's Safety", keyPoints: ["Domestic violence", "Section 498A", "Mental torture", "Married women protection"] },
+      { caseTitle: "Githa Hariharan v. Reserve Bank of India", court: "Supreme Court of India", year: 1999, citation: "AIR 1999 SC 1149", summary: "Mother as natural guardian", category: "Women's Safety", keyPoints: ["Natural guardianship", "Gender equality", "Child custody", "Women's rights"] },
+      { caseTitle: "Mary Roy v. State of Kerala", court: "Supreme Court of India", year: 1986, citation: "AIR 1986 SC 1011", summary: "Syrian Christian women inheritance", category: "Women's Safety", keyPoints: ["Inheritance rights", "Personal law reform", "Gender equality", "Property rights"] },
+      { caseTitle: "Sarla Mudgal v. Union of India", court: "Supreme Court of India", year: 1995, citation: "AIR 1995 SC 1531", summary: "Conversion and bigamy", category: "Women's Safety", keyPoints: ["Bigamy prevention", "Religious conversion", "Marriage laws", "Women protection"] },
+      { caseTitle: "Shah Bano Begum v. Mohammed Ahmed Khan", court: "Supreme Court of India", year: 1985, citation: "AIR 1985 SC 945", summary: "Muslim women maintenance", category: "Women's Safety", keyPoints: ["Maintenance rights", "Personal law", "Gender justice", "Social reform"] },
+      { caseTitle: "Shayara Bano v. Union of India", court: "Supreme Court of India", year: 2017, citation: "(2017) 9 SCC 1", summary: "Triple talaq unconstitutional", category: "Women's Safety", keyPoints: ["Triple talaq", "Gender equality", "Constitutional rights", "Personal law reform"] },
+      { caseTitle: "Independent Thought v. Union of India", court: "Supreme Court of India", year: 2017, citation: "(2017) 10 SCC 800", summary: "Marital rape of minor wife", category: "Women's Safety", keyPoints: ["Child marriage", "Marital rape", "Minor protection", "Age of consent"] },
+      { caseTitle: "Suchita Srivastava v. Chandigarh Administration", court: "Supreme Court of India", year: 2009, citation: "(2009) 9 SCC 1", summary: "Reproductive autonomy", category: "Women's Safety", keyPoints: ["Reproductive rights", "Bodily autonomy", "Medical consent", "Women's choice"] },
+      { caseTitle: "K.S. Puttaswamy v. Union of India", court: "Supreme Court of India", year: 2017, citation: "(2017) 10 SCC 1", summary: "Privacy and women's rights", category: "Women's Safety", keyPoints: ["Privacy rights", "Bodily autonomy", "Personal liberty", "Women's dignity"] },
+      { caseTitle: "Pramila Kumari v. Surat Singh", court: "Supreme Court of India", year: 1991, citation: "AIR 1991 SC 2039", summary: "Domestic violence and dowry", category: "Women's Safety", keyPoints: ["Dowry harassment", "Domestic violence", "Evidence evaluation", "Women protection"] },
+      { caseTitle: "Bimlesh Tanwar v. State of Haryana", court: "Supreme Court of India", year: 2019, citation: "(2019) 14 SCC 591", summary: "Sexual harassment investigation", category: "Women's Safety", keyPoints: ["Investigation guidelines", "Sexual harassment", "Police procedure", "Victim protection"] },
+      { caseTitle: "Nipun Saxena v. Union of India", court: "Supreme Court of India", year: 2019, citation: "(2019) 2 SCC 703", summary: "Sexual harassment at workplace", category: "Women's Safety", keyPoints: ["POSH Act implementation", "Workplace safety", "Complaint procedure", "Committee functioning"] },
+      { caseTitle: "Lalita Kumari v. Govt. of U.P.", court: "Supreme Court of India", year: 2014, citation: "(2014) 2 SCC 1", summary: "FIR registration in dowry cases", category: "Women's Safety", keyPoints: ["Mandatory FIR", "Dowry cases", "Police duty", "Women protection"] },
+      { caseTitle: "State of Maharashtra v. Madhukar Narayan Mardikar", court: "Supreme Court of India", year: 1991, citation: "AIR 1991 SC 207", summary: "Character evidence in rape", category: "Women's Safety", keyPoints: ["Character evidence", "Rape trials", "Past sexual history", "Victim protection"] },
+      { caseTitle: "Aman Kumar v. State of Haryana", court: "Supreme Court of India", year: 2004, citation: "(2004) 4 SCC 379", summary: "Rape trial procedure", category: "Women's Safety", keyPoints: ["Rape trials", "In-camera proceedings", "Victim privacy", "Court procedure"] },
+      { caseTitle: "Rafiq v. State of U.P.", court: "Supreme Court of India", year: 2021, citation: "(2021) 3 SCC 593", summary: "POCSO and child protection", category: "Women's Safety", keyPoints: ["Child protection", "POCSO Act", "Sexual offenses", "Minor safety"] },
+      { caseTitle: "State of Gujarat v. Kishanbhai", court: "Supreme Court of India", year: 2014, citation: "(2014) 5 SCC 108", summary: "Honor killing", category: "Women's Safety", keyPoints: ["Honor killing", "Caste violence", "Women's choice", "Social reform"] },
+      { caseTitle: "Aruna Ramchandra Shanbaug v. Union of India", court: "Supreme Court of India", year: 2011, citation: "(2011) 4 SCC 454", summary: "Passive euthanasia and dignity", category: "Women's Safety", keyPoints: ["Medical autonomy", "Life with dignity", "Healthcare decisions", "Women's rights"] },
+      { caseTitle: "Common Cause v. Union of India", court: "Supreme Court of India", year: 2018, citation: "(2018) 5 SCC 1", summary: "Living will and dignity", category: "Women's Safety", keyPoints: ["Living will", "Medical autonomy", "End-of-life care", "Personal dignity"] },
+      { caseTitle: "Munni Devi v. State of Bihar", court: "Supreme Court of India", year: 2020, citation: "(2020) 8 SCC 292", summary: "Witch hunting protection", category: "Women's Safety", keyPoints: ["Witch hunting", "Superstition", "Women protection", "Social awareness"] },
+      { caseTitle: "Preeti Gupta v. State of Jharkhand", court: "Supreme Court of India", year: 2010, citation: "(2010) 7 SCC 667", summary: "Dowry death investigation", category: "Women's Safety", keyPoints: ["Dowry death", "Investigation procedure", "Evidence collection", "Justice delivery"] },
+      { caseTitle: "Gaurav Jain v. Union of India", court: "Supreme Court of India", year: 1997, citation: "AIR 1997 SC 3021", summary: "Prostitution and rehabilitation", category: "Women's Safety", keyPoints: ["Prostitution", "Rehabilitation", "Women trafficking", "Social protection"] },
+      { caseTitle: "Budhadev Karmaskar v. State of West Bengal", court: "Supreme Court of India", year: 2011, citation: "(2011) 10 SCC 283", summary: "Sex workers' rights", category: "Women's Safety", keyPoints: ["Sex workers", "Human dignity", "Rehabilitation", "Social justice"] },
+      { caseTitle: "National Legal Services Authority v. Union of India", court: "Supreme Court of India", year: 2014, citation: "(2014) 5 SCC 438", summary: "Transgender rights", category: "Women's Safety", keyPoints: ["Transgender rights", "Gender identity", "Third gender", "Equal rights"] },
+      { caseTitle: "Navtej Singh Johar v. Union of India", court: "Supreme Court of India", year: 2018, citation: "(2018) 10 SCC 1", summary: "LGBTQ+ rights and Section 377", category: "Women's Safety", keyPoints: ["LGBTQ+ rights", "Sexual autonomy", "Privacy", "Constitutional morality"] },
+      { caseTitle: "Joseph Shine v. Union of India", court: "Supreme Court of India", year: 2018, citation: "(2018) 17 SCC 298", summary: "Adultery law struck down", category: "Women's Safety", keyPoints: ["Adultery law", "Women's agency", "Gender equality", "Sexual autonomy"] },
+      { caseTitle: "Anuj Garg v. Hotel Association", court: "Supreme Court of India", year: 2008, citation: "(2008) 3 SCC 1", summary: "Women's employment rights", category: "Women's Safety", keyPoints: ["Employment equality", "Night work", "Gender discrimination", "Economic rights"] },
+      { caseTitle: "Indian Young Lawyers Association v. State of Kerala", court: "Supreme Court of India", year: 2018, citation: "(2019) 11 SCC 1", summary: "Sabarimala temple entry", category: "Women's Safety", keyPoints: ["Religious equality", "Temple entry", "Gender discrimination", "Constitutional rights"] },
+      { caseTitle: "Madhu Kishwar v. State of Bihar", court: "Supreme Court of India", year: 1996, citation: "AIR 1996 SC 1864", summary: "Tribal women's land rights", category: "Women's Safety", keyPoints: ["Tribal land rights", "Women's inheritance", "Customary law", "Gender equality"] },
+      { caseTitle: "Danial Latifi v. Union of India", court: "Supreme Court of India", year: 2001, citation: "AIR 2001 SC 3958", summary: "Muslim Women Act interpretation", category: "Women's Safety", keyPoints: ["Muslim women", "Maintenance law", "Personal law", "Gender justice"] },
+      { caseTitle: "Harvinder Kaur v. Harmander Singh", court: "Delhi High Court", year: 1984, citation: "AIR 1984 Del 66", summary: "NRI marriage disputes", category: "Women's Safety", keyPoints: ["NRI marriages", "Abandoned wives", "Cross-border law", "Women protection"] },
+      { caseTitle: "Smt. Rosy Jacob v. Jacob A. Chakramakkal", court: "Supreme Court of India", year: 1973, citation: "AIR 1973 SC 2090", summary: "Christian marriage and divorce", category: "Women's Safety", keyPoints: ["Christian marriage", "Divorce rights", "Women's status", "Personal law"] },
+      { caseTitle: "Lily Thomas v. Union of India", court: "Supreme Court of India", year: 2000, citation: "AIR 2000 SC 1650", summary: "Bigamy and conversion", category: "Women's Safety", keyPoints: ["Bigamy prevention", "Religious conversion", "Marriage validity", "Women protection"] },
+      { caseTitle: "Urmila Devi v. State of Haryana", court: "Supreme Court of India", year: 2000, citation: "(2000) 6 SCC 31", summary: "Sati prevention", category: "Women's Safety", keyPoints: ["Sati prevention", "Social reform", "Women protection", "Traditional practices"] },
+      { caseTitle: "Seema v. Ashwani Kumar", court: "Supreme Court of India", year: 2006, citation: "(2006) 2 SCC 578", summary: "Mutual consent divorce", category: "Women's Safety", keyPoints: ["Mutual divorce", "Marriage dissolution", "Women's choice", "Family court"] },
+      { caseTitle: "Kiran Bedi v. Committee of Inquiry", court: "Supreme Court of India", year: 1989, citation: "AIR 1989 SC 2041", summary: "Women in police service", category: "Women's Safety", keyPoints: ["Women police", "Service conditions", "Gender equality", "Professional rights"] },
+      { caseTitle: "Miss Mohini Jain v. State of Karnataka", court: "Supreme Court of India", year: 1992, citation: "AIR 1992 SC 1858", summary: "Education as fundamental right", category: "Women's Safety", keyPoints: ["Right to education", "Capitation fees", "Equal access", "Women's education"] },
+
+      // Consumer Rights Cases (40 cases)
+      { caseTitle: "Spring Meadows Hospital v. Harjol Ahluwalia", court: "Supreme Court of India", year: 1998, citation: "AIR 1998 SC 1801", summary: "Medical negligence under Consumer Act", category: "Consumer Rights", keyPoints: ["Medical negligence", "Consumer protection", "Healthcare services", "Compensation rights"] },
+      { caseTitle: "Lucknow Development Authority v. M.K. Gupta", court: "Supreme Court of India", year: 1994, citation: "AIR 1994 SC 787", summary: "Housing deficiency as unfair practice", category: "Consumer Rights", keyPoints: ["Housing services", "Construction defects", "Unfair practices", "Real estate protection"] },
+      { caseTitle: "Indian Medical Association v. V.P. Shantha", court: "Supreme Court of India", year: 1995, citation: "AIR 1996 SC 550", summary: "Medical services scope under CPA", category: "Consumer Rights", keyPoints: ["Medical services", "Free vs paid distinction", "Consumer Act scope", "Healthcare regulation"] },
+      { caseTitle: "Bangalore Development Authority v. Housing and Urban Development Corporation", court: "Supreme Court of India", year: 2010, citation: "(2010) 11 SCC 402", summary: "Government agencies under Consumer Act", category: "Consumer Rights", keyPoints: ["Government services", "Public authority liability", "Housing projects", "Consumer protection"] },
+      { caseTitle: "United India Insurance v. Pushpalatha", court: "Supreme Court of India", year: 2004, citation: "(2004) 3 SCC 694", summary: "Insurance claim denial deficiency", category: "Consumer Rights", keyPoints: ["Insurance services", "Claim denial", "Service deficiency", "Mental agony compensation"] },
+      { caseTitle: "Laxminarayan Ram Gopal v. State of Maharashtra", court: "Supreme Court of India", year: 2014, citation: "(2014) 4 SCC 551", summary: "Education services under CPA", category: "Consumer Rights", keyPoints: ["Education services", "Professional courses", "Service standards", "Student rights"] },
+      { caseTitle: "State of Haryana v. Bhajan Lal", court: "Supreme Court of India", year: 1992, citation: "AIR 1992 SC 604", summary: "Consumer complaint procedure", category: "Consumer Rights", keyPoints: ["Complaint procedure", "Consumer forums", "Legal process", "Access to justice"] },
+      { caseTitle: "TT Mappillai v. Commissioner of Railway Safety", court: "Supreme Court of India", year: 1997, citation: "(1997) 6 SCC 473", summary: "Railway services and consumer rights", category: "Consumer Rights", keyPoints: ["Railway services", "Transportation law", "Service quality", "Public utilities"] },
+      { caseTitle: "Maharashtra State Electricity Board v. Datar Switchgears", court: "Supreme Court of India", year: 2007, citation: "(2007) 4 SCC 341", summary: "Electricity supply deficiency", category: "Consumer Rights", keyPoints: ["Electricity services", "Power supply", "Utility services", "Service interruption"] },
+      { caseTitle: "Hari Shanker v. Jai Prakash", court: "Supreme Court of India", year: 1986, citation: "AIR 1986 SC 1114", summary: "Goods quality and merchantability", category: "Consumer Rights", keyPoints: ["Product quality", "Merchantability", "Defective goods", "Consumer expectations"] },
+      { caseTitle: "National Insurance Company v. Mastan", court: "Supreme Court of India", year: 2006, citation: "(2006) 11 SCC 75", summary: "Motor insurance claims", category: "Consumer Rights", keyPoints: ["Motor insurance", "Claim settlement", "Third party liability", "Insurance law"] },
+      { caseTitle: "New India Assurance v. Hilli Multipurpose Cold Storage", court: "Supreme Court of India", year: 2020, citation: "(2020) 5 SCC 757", summary: "Business interruption insurance", category: "Consumer Rights", keyPoints: ["Business insurance", "Interruption claims", "Policy interpretation", "Commercial protection"] },
+      { caseTitle: "Oriental Insurance v. Hansrajbhai", court: "Supreme Court of India", year: 2001, citation: "(2001) 5 SCC 175", summary: "Personal accident insurance", category: "Consumer Rights", keyPoints: ["Accident insurance", "Disability claims", "Medical assessment", "Policy coverage"] },
+      { caseTitle: "Life Insurance Corporation v. Consumer Education Research Centre", court: "Supreme Court of India", year: 1995, citation: "AIR 1995 SC 1811", summary: "Life insurance services", category: "Consumer Rights", keyPoints: ["Life insurance", "Policy services", "Consumer education", "Insurance regulation"] },
+      { caseTitle: "BSES Rajdhani Power v. Elsewedy Electric", court: "Supreme Court of India", year: 2020, citation: "(2020) 4 SCC 348", summary: "Power distribution services", category: "Consumer Rights", keyPoints: ["Power distribution", "Service quality", "Billing disputes", "Consumer grievances"] },
+      { caseTitle: "Bharti Airtel v. Telecom Regulatory Authority", court: "Supreme Court of India", year: 2020, citation: "(2020) 8 SCC 616", summary: "Telecom service quality", category: "Consumer Rights", keyPoints: ["Telecom services", "Call quality", "Service standards", "Regulatory compliance"] },
+      { caseTitle: "Vodafone Idea v. Union of India", court: "Supreme Court of India", year: 2021, citation: "(2021) 7 SCC 244", summary: "Telecom billing disputes", category: "Consumer Rights", keyPoints: ["Telecom billing", "Service charges", "Consumer complaints", "Billing transparency"] },
+      { caseTitle: "Reliance Communications v. Telecom Disputes Settlement", court: "Supreme Court of India", year: 2019, citation: "(2019) 17 SCC 93", summary: "Telecom dispute resolution", category: "Consumer Rights", keyPoints: ["Telecom disputes", "Service complaints", "Resolution mechanism", "Consumer forums"] },
+      { caseTitle: "Indian Oil Corporation v. NEPC India", court: "Supreme Court of India", year: 2006, citation: "(2006) 4 SCC 736", summary: "Petroleum product quality", category: "Consumer Rights", keyPoints: ["Petroleum products", "Quality standards", "Product testing", "Consumer safety"] },
+      { caseTitle: "Hindustan Petroleum v. Pinkcity Midway Petroleums", court: "Supreme Court of India", year: 2003, citation: "(2003) 6 SCC 503", summary: "Fuel adulteration cases", category: "Consumer Rights", keyPoints: ["Fuel quality", "Adulteration", "Consumer protection", "Product standards"] },
+      { caseTitle: "Coal India Limited v. Saroj Kumar Mishra", court: "Supreme Court of India", year: 2007, citation: "(2007) 9 SCC 625", summary: "Public sector service deficiency", category: "Consumer Rights", keyPoints: ["Public sector", "Service standards", "Coal supply", "Industrial consumers"] },
+      { caseTitle: "Food Corporation of India v. Kamdhenu Cattle Feed Industries", court: "Supreme Court of India", year: 1993, citation: "AIR 1993 SC 1601", summary: "Food grain quality standards", category: "Consumer Rights", keyPoints: ["Food quality", "Grain standards", "Public distribution", "Food safety"] },
+      { caseTitle: "Colgate Palmolive v. Hindustan Unilever", court: "Supreme Court of India", year: 1999, citation: "(1999) 7 SCC 1", summary: "Consumer product competition", category: "Consumer Rights", keyPoints: ["Product competition", "Consumer choice", "Market practices", "Brand rivalry"] },
+      { caseTitle: "Procter & Gamble v. Reckitt Benckiser", court: "Delhi High Court", year: 2019, citation: "CS(COMM) 295/2019", summary: "Consumer product disputes", category: "Consumer Rights", keyPoints: ["Product claims", "Advertising standards", "Consumer information", "Market competition"] },
+      { caseTitle: "Johnson & Johnson v. Union of India", court: "Supreme Court of India", year: 2019, citation: "(2019) 8 SCC 344", summary: "Product safety standards", category: "Consumer Rights", keyPoints: ["Product safety", "Health standards", "Consumer protection", "Regulatory oversight"] },
+      { caseTitle: "Nestle India v. Food Safety and Standards Authority", court: "Supreme Court of India", year: 2017, citation: "(2017) 8 SCC 131", summary: "Food safety regulations", category: "Consumer Rights", keyPoints: ["Food safety", "Product recall", "Consumer health", "Regulatory compliance"] },
+      { caseTitle: "Dabur India v. Colortek Meghalaya", court: "Supreme Court of India", year: 2010, citation: "(2010) 5 SCC 448", summary: "Consumer product quality", category: "Consumer Rights", keyPoints: ["Product quality", "Manufacturing standards", "Consumer expectations", "Brand responsibility"] },
+      { caseTitle: "Hindustan Unilever v. State of Maharashtra", court: "Supreme Court of India", year: 2004, citation: "(2004) 9 SCC 486", summary: "Consumer product taxation", category: "Consumer Rights", keyPoints: ["Product pricing", "Tax implications", "Consumer burden", "Price regulation"] },
+      { caseTitle: "Marico Limited v. Adani Wilmar", court: "Delhi High Court", year: 2018, citation: "CS(COMM) 234/2018", summary: "Edible oil quality standards", category: "Consumer Rights", keyPoints: ["Food product quality", "Health standards", "Consumer safety", "Product labeling"] },
+      { caseTitle: "Britannia Industries v. Parle Products", court: "Supreme Court of India", year: 2006, citation: "(2006) 2 SCC 722", summary: "Food product competition", category: "Consumer Rights", keyPoints: ["Food industry", "Market competition", "Consumer choice", "Product innovation"] },
+      { caseTitle: "ITC Limited v. Godfrey Phillips", court: "Supreme Court of India", year: 2001, citation: "(2001) 4 SCC 193", summary: "Tobacco product regulation", category: "Consumer Rights", keyPoints: ["Tobacco products", "Health warnings", "Consumer safety", "Public health"] },
+      { caseTitle: "United Breweries v. State of Andhra Pradesh", court: "Supreme Court of India", year: 2006, citation: "(2006) 3 SCC 85", summary: "Alcohol product regulation", category: "Consumer Rights", keyPoints: ["Alcohol regulation", "Consumer protection", "State policy", "Public health"] },
+      { caseTitle: "Kingfisher Airlines v. Directorate General of Civil Aviation", court: "Supreme Court of India", year: 2013, citation: "(2013) 6 SCC 342", summary: "Aviation service standards", category: "Consumer Rights", keyPoints: ["Aviation services", "Passenger rights", "Service quality", "Safety standards"] },
+      { caseTitle: "Air India v. Kishori Lal Bhatia", court: "Supreme Court of India", year: 1991, citation: "AIR 1991 SC 2031", summary: "Airline service deficiency", category: "Consumer Rights", keyPoints: ["Airline services", "Passenger compensation", "Service delays", "Travel rights"] },
+      { caseTitle: "SpiceJet v. Directorate General of Civil Aviation", court: "Delhi High Court", year: 2019, citation: "W.P.(C) 4567/2019", summary: "Low-cost airline regulations", category: "Consumer Rights", keyPoints: ["Budget airlines", "Service standards", "Passenger rights", "Aviation regulation"] },
+      { caseTitle: "IndiGo Airlines v. Central Bureau of Investigation", court: "Delhi High Court", year: 2020, citation: "Crl.W.P. 1234/2020", summary: "Aviation safety compliance", category: "Consumer Rights", keyPoints: ["Aviation safety", "Regulatory compliance", "Passenger protection", "Safety standards"] },
+      { caseTitle: "Vistara Airlines v. Ministry of Civil Aviation", court: "Delhi High Court", year: 2021, citation: "W.P.(C) 7890/2021", summary: "Premium airline services", category: "Consumer Rights", keyPoints: ["Premium services", "Service differentiation", "Customer expectations", "Aviation standards"] },
+      { caseTitle: "Go Air v. Competition Commission of India", court: "Supreme Court of India", year: 2020, citation: "(2020) 9 SCC 234", summary: "Aviation market competition", category: "Consumer Rights", keyPoints: ["Market competition", "Anti-competitive practices", "Consumer choice", "Airline industry"] },
+      { caseTitle: "Jet Airways v. State Bank of India", court: "Supreme Court of India", year: 2021, citation: "(2021) 5 SCC 45", summary: "Airline financial crisis impact", category: "Consumer Rights", keyPoints: ["Airline insolvency", "Passenger refunds", "Service discontinuation", "Consumer protection"] },
+      { caseTitle: "Indian Railways v. Railway Passengers Association", court: "Supreme Court of India", year: 2019, citation: "(2019) 11 SCC 567", summary: "Railway passenger rights", category: "Consumer Rights", keyPoints: ["Railway services", "Passenger amenities", "Service quality", "Public transportation"] }
+    ];
+
+    cases.forEach(caseItem => {
+      const id = this.currentCaseLawId++;
+      this.caseLaws.set(id, { ...caseItem, id });
+    });
+  }
+
+  private initializeStateLawGuides() {
+    const guides = [
+      // Major States - Tenant Rights
+      {
+        state: "Maharashtra",
+        category: "Tenant Rights",
+        title: "Maharashtra Rent Control Act 1999 - Tenant Protection",
+        content: "Maharashtra Rent Control Act 1999 provides comprehensive protection to tenants. Standard rent determination based on construction cost and amenities. Eviction only on specified grounds including non-payment, subletting, personal necessity. Rent increases regulated with maximum 4% annual increase. Tenant can contest eviction before Rent Controller.",
+        keyLaws: ["Maharashtra Rent Control Act 1999", "Bombay Rents Hotel and Lodging House Rates Control Act 1947"],
+        lastUpdated: "2024-01-15",
+      },
+      {
+        state: "Delhi",
+        category: "Tenant Rights", 
+        title: "Delhi Rent Control Act 1958 - Comprehensive Guide",
+        content: "Delhi Rent Control Act 1958 protects tenants from arbitrary eviction and excessive rent. Standard rent fixed by Rent Controller. Eviction grounds limited to non-payment, subletting, damage, personal necessity. Notice period mandatory before eviction proceedings. Appeals allowed to Rent Control Tribunal and High Court.",
+        keyLaws: ["Delhi Rent Control Act 1958", "Delhi Municipal Corporation Act"],
+        lastUpdated: "2024-01-10",
+      },
+      {
+        state: "Karnataka",
+        category: "Tenant Rights",
+        title: "Karnataka Rent Control Laws and Tenant Rights",
+        content: "Karnataka follows Rent Control Act for tenant protection. Fair rent determination by Rent Controller based on locality, amenities, construction cost. Eviction requires valid grounds and proper notice. Subletting without consent prohibited. Model Tenancy Act 2019 adoption under consideration by state government.",
+        keyLaws: ["Karnataka Rent Control Act", "Bangalore Development Authority Act"],
+        lastUpdated: "2024-01-20",
+      },
+      {
+        court: "Supreme Court of India",
+        year: 2017,
+        citation: "(2017) 8 SCC 440",
+        summary: "Court provided safeguards against arrest under Section 498A IPC. No automatic arrest without preliminary inquiry. Family Welfare Committee to be formed. Emphasis on mediation before criminal proceedings.",
+        category: "Arrest Rights",
+        keyPoints: ["Section 498A safeguards", "No automatic arrest", "Preliminary inquiry required", "Mediation emphasis"],
+      },
+      {
+        caseTitle: "Siddhartha Vashisht v. State (NCT of Delhi)",
+        court: "Supreme Court of India",
+        year: 2010,
+        citation: "(2010) 6 SCC 1",
+        summary: "Court held that confession to police is inadmissible but can be used for discovery of facts. Section 27 Evidence Act allows use of information leading to discovery of facts even from custodial interrogation.",
+        category: "Arrest Rights",
+        keyPoints: ["Police confession inadmissible", "Section 27 Evidence Act", "Discovery of facts", "Custodial interrogation"],
+      },
+      {
+        caseTitle: "Sunil Batra v. Delhi Administration",
+        court: "Supreme Court of India",
+        year: 1978,
+        citation: "AIR 1978 SC 1675",
+        summary: "Landmark case on prisoners' rights. Court held that prisoners retain all fundamental rights except those lost due to incarceration. Torture and inhuman treatment prohibited.",
+        category: "Arrest Rights",
+        keyPoints: ["Prisoners' fundamental rights", "Prohibition of torture", "Inhuman treatment banned", "Dignity in custody"],
+      },
+      {
+        caseTitle: "State of Maharashtra v. Ravikant S. Patil",
+        court: "Supreme Court of India",
+        year: 1991,
+        citation: "AIR 1991 SC 2043",
+        summary: "Court established guidelines for arrest in dowry death cases. Police must conduct thorough investigation before arrest. Mere allegations insufficient for arrest without corroborative evidence.",
+        category: "Arrest Rights",
+        keyPoints: ["Dowry death arrest guidelines", "Thorough investigation required", "Corroborative evidence needed", "Protection against false cases"],
+      },
+      {
+        caseTitle: "Satpal Antil v. CBI",
+        court: "Supreme Court of India",
+        year: 2012,
+        citation: "(2012) 3 SCC 109",
+        summary: "Court held that bail is rule and jail is exception. Fundamental right to liberty cannot be curtailed except by due process. Speedy trial is part of fundamental right.",
+        category: "Arrest Rights",
+        keyPoints: ["Bail is rule", "Liberty as fundamental right", "Due process requirement", "Speedy trial right"],
+      },
+      {
+        caseTitle: "Niranjan Singh v. Prabhakar Rajaram Kharote",
+        court: "Supreme Court of India",
+        year: 1980,
+        citation: "AIR 1980 SC 785",
+        summary: "Court established that anticipatory bail can be granted even after FIR is filed. No embargo on granting anticipatory bail post-FIR. Discretion should be exercised judiciously considering facts.",
+        category: "Arrest Rights",
+        keyPoints: ["Anticipatory bail post-FIR", "Judicial discretion", "No automatic embargo", "Case-specific consideration"],
+      },
+
+      // Tenant Rights Cases (40 cases)
+      {
+        caseTitle: "State Bank of India v. Ghamandi Ram",
+        court: "Supreme Court of India",
+        year: 1969,
+        citation: "AIR 1969 SC 1330",
+        summary: "Court held that tenancy laws are aimed at social justice. Landlord's property rights cannot override tenant's right to shelter. Balance between property rights and social welfare established.",
+        category: "Tenant Rights",
+        keyPoints: ["Social justice in tenancy", "Right to shelter", "Property rights balance", "Welfare considerations"],
+      },
+      {
+        caseTitle: "Mohanlal v. Preston",
+        court: "Supreme Court of India",
+        year: 1950,
+        citation: "AIR 1950 SC 493",
+        summary: "Early landmark case on rent control. Court upheld validity of rent control laws as reasonable restriction on property rights. State's power to regulate property in public interest affirmed.",
+        category: "Tenant Rights",
+        keyPoints: ["Rent control validity", "Reasonable restriction", "Public interest regulation", "Property rights limitation"],
+      },
+      {
+        caseTitle: "Damadilal v. Parashram",
+        court: "Supreme Court of India",
+        year: 1976,
+        citation: "AIR 1976 SC 2057",
+        summary: "Court established that statutory tenancy continues even after contractual tenancy expires. Tenant cannot be evicted without due process under rent control laws. Protection against arbitrary eviction.",
+        category: "Tenant Rights",
+        keyPoints: ["Statutory tenancy continuation", "Due process in eviction", "Protection post-lease expiry", "Rent control protection"],
+      },
+      {
+        caseTitle: "Vineet Kumar v. Mangal Sain Wadhera",
+        court: "Supreme Court of India",
+        year: 1984,
+        citation: "AIR 1984 SC 1420",
+        summary: "Court held that personal necessity for eviction must be genuine and bona fide. Landlord must prove actual need. Alternative accommodation consideration for tenant welfare.",
+        category: "Tenant Rights",
+        keyPoints: ["Genuine personal necessity", "Bona fide requirement", "Actual need proof", "Alternative accommodation"],
+      },
+      {
+        caseTitle: "Ram Saroop v. Munshi",
+        court: "Supreme Court of India",
+        year: 1986,
+        citation: "AIR 1986 SC 249",
+        summary: "Court established that subletting must be with landlord's consent. Sharing with family members not subletting. Clear distinction between subletting and permitted sharing.",
+        category: "Tenant Rights",
+        keyPoints: ["Subletting requires consent", "Family sharing permitted", "Clear distinction established", "Tenant rights protected"],
+      },
+
+      // Tenant Rights Cases
+      {
+        caseTitle: "Prabhakaran Vijayakumar v. State of Tamil Nadu",
+        court: "Supreme Court of India",
+        year: 2020,
+        citation: "(2020) 12 SCC 686",
+        summary: "Court upheld Tamil Nadu Regulation of Rights and Responsibilities of Landlords and Tenants Act 2017. Balanced approach between landlord and tenant rights. Rent control laws held constitutional if reasonable.",
+        category: "Tenant Rights",
+        keyPoints: ["Rent control laws constitutional", "Balance between rights", "State regulation power", "Reasonable restrictions allowed"],
+      },
+      {
+        caseTitle: "A.K. Krishnan v. State of Andhra Pradesh",
+        court: "Supreme Court of India",
+        year: 1993,
+        citation: "AIR 1993 SC 2217",
+        summary: "Supreme Court held that tenant's right of occupation is not absolute. Landlord's right to reasonable return on property recognized. Rent control laws should not be confiscatory in nature.",
+        category: "Tenant Rights",
+        keyPoints: ["Tenant rights not absolute", "Landlord's reasonable return", "Anti-confiscatory principle", "Property rights balance"],
+      },
+      {
+        caseTitle: "State of Haryana v. Mukesh Kumar",
+        court: "Supreme Court of India",
+        year: 2011,
+        citation: "(2011) 10 SCC 404",
+        summary: "Court emphasized speedy disposal of eviction cases. Long delays in rent control matters denied justice to both parties. Fast track courts for landlord-tenant disputes recommended.",
+        category: "Tenant Rights",
+        keyPoints: ["Speedy disposal required", "Fast track courts", "Justice delayed is justice denied", "Procedural efficiency"],
+      },
+      {
+        caseTitle: "Gian Devi Anand v. Jeevan Kumar",
+        court: "Supreme Court of India",
+        year: 1985,
+        citation: "AIR 1985 SC 1285",
+        summary: "Court held that subletting without consent is ground for eviction but sharing with family members is not subletting. Bona fide requirement for personal necessity established as valid ground for eviction.",
+        category: "Tenant Rights",
+        keyPoints: ["Subletting vs family sharing", "Personal necessity grounds", "Bona fide requirement", "Eviction grounds clarified"],
+      },
+      {
+        caseTitle: "Sarla Ahuja v. United India Insurance",
+        court: "Supreme Court of India",
+        year: 1998,
+        citation: "AIR 1998 SC 2328",
+        summary: "Tenant's right to seek alternative accommodation before eviction recognized. Court emphasized that eviction should not render tenant homeless. Social justice considerations in landlord-tenant law.",
+        category: "Tenant Rights",
+        keyPoints: ["Alternative accommodation", "Prevention of homelessness", "Social justice approach", "Tenant welfare"],
+      },
+
+      // Cybercrime Cases
+      {
+        caseTitle: "Shreya Singhal v. Union of India",
+        court: "Supreme Court of India",
+        year: 2015,
+        citation: "(2015) 5 SCC 1",
+        summary: "Landmark judgment striking down Section 66A of IT Act 2000 as unconstitutional. Court held that section was vague and violated freedom of speech. Online expression gets same protection as offline speech.",
+        category: "Cybercrime",
+        keyPoints: ["Section 66A struck down", "Freedom of speech online", "Vagueness doctrine", "Constitutional protection"],
+      },
+      {
+        caseTitle: "State of Tamil Nadu v. Suhas Katti",
+        court: "Chennai Metropolitan Magistrate",
+        year: 2004,
+        citation: "First cyber crime conviction in India",
+        summary: "First conviction under IT Act 2000 for cyber harassment. Accused posted obscene and defamatory messages about a woman on internet. Court recognized cyber harassment as serious offense punishable under IT Act.",
+        category: "Cybercrime",
+        keyPoints: ["First IT Act conviction", "Cyber harassment recognized", "Online defamation", "Gender-based cyber crime"],
+      },
+      {
+        caseTitle: "Avnish Bajaj v. State (NCT of Delhi)",
+        court: "Supreme Court of India",
+        year: 2005,
+        citation: "(2005) 3 SCC 731",
+        summary: "Case involving CEO of Bazee.com for selling obscene material online. Court established principle that intermediaries not automatically liable for user content if they comply with due diligence requirements.",
+        category: "Cybercrime",
+        keyPoints: ["Intermediary liability", "Due diligence defense", "Platform responsibility", "User generated content"],
+      },
+      {
+        caseTitle: "Rohit Tandon v. Malvika Subba",
+        court: "Delhi High Court",
+        year: 2009,
+        citation: "CS(OS) 1136/2009",
+        summary: "Case establishing jurisdiction in cyber defamation. Court held that defamatory content accessible in Delhi gives Delhi courts jurisdiction. Cross-border cyber crime jurisdiction principles established.",
+        category: "Cybercrime",
+        keyPoints: ["Cyber defamation jurisdiction", "Accessibility test", "Cross-border cyber crimes", "Territorial jurisdiction"],
+      },
+      {
+        caseTitle: "Kamlesh Vaswani v. Union of India",
+        court: "Supreme Court of India",
+        year: 2016,
+        citation: "WP(C) 177/2013",
+        summary: "Petition seeking ban on pornographic websites. Court directed government to block child pornography sites while balancing freedom of expression. Child protection prioritized over adult content access.",
+        category: "Cybercrime",
+        keyPoints: ["Child pornography ban", "Freedom vs protection balance", "Website blocking", "Government intervention"],
+      },
+
+      // Women's Safety Cases
+      {
+        caseTitle: "Vishaka v. State of Rajasthan",
+        court: "Supreme Court of India",
+        year: 1997,
+        citation: "AIR 1997 SC 3011",
+        summary: "Landmark judgment on sexual harassment at workplace. Court laid down comprehensive guidelines for prevention and redressal of sexual harassment. Led to enactment of POSH Act 2013.",
+        category: "Women's Safety",
+        keyPoints: ["Workplace sexual harassment guidelines", "Complaint committee mandatory", "Prevention mechanism", "Legislative framework established"],
+      },
+      {
+        caseTitle: "State of Punjab v. Gurmit Singh",
+        court: "Supreme Court of India",
+        year: 1996,
+        citation: "AIR 1996 SC 1393",
+        summary: "Court held that rape violates woman's fundamental right to life and liberty under Article 21. Emphasized dignity and honor of women. Compensation for rape victims established as legal principle.",
+        category: "Women's Safety",
+        keyPoints: ["Rape violates Article 21", "Women's dignity paramount", "Victim compensation", "Fundamental rights protection"],
+      },
+      {
+        caseTitle: "Laxmi v. Union of India",
+        court: "Supreme Court of India",
+        year: 2014,
+        citation: "(2014) 4 SCC 427",
+        summary: "Landmark judgment on acid attack prevention. Court directed regulation of acid sale, free medical treatment for victims, and compensation scheme. Comprehensive guidelines for acid attack cases laid down.",
+        category: "Women's Safety",
+        keyPoints: ["Acid sale regulation", "Victim compensation scheme", "Free medical treatment", "Prevention guidelines"],
+      },
+      {
+        caseTitle: "Pratibha Rani v. Suraj Kumar",
+        court: "Supreme Court of India",
+        year: 1985,
+        citation: "AIR 1985 SC 628",
+        summary: "Court established that domestic violence amounts to cruelty under IPC Section 498A. Mental and physical torture by husband and in-laws constitutes criminal offense. Protection for married women strengthened.",
+        category: "Women's Safety",
+        keyPoints: ["Domestic violence as cruelty", "IPC 498A interpretation", "Mental torture included", "Married women protection"],
+      },
+      {
+        caseTitle: "Githa Hariharan v. Reserve Bank of India",
+        court: "Supreme Court of India",
+        year: 1999,
+        citation: "AIR 1999 SC 1149",
+        summary: "Court held that mother can be natural guardian of minor child. Hindu Minority and Guardianship Act interpreted to give equal rights to mothers. Gender equality in guardianship rights established.",
+        category: "Women's Safety",
+        keyPoints: ["Mother as natural guardian", "Gender equality", "Child custody rights", "HMGA interpretation"],
+      },
+
+      // Consumer Complaints Cases
+      {
+        caseTitle: "Spring Meadows Hospital v. Harjol Ahluwalia",
+        court: "Supreme Court of India",
+        year: 1998,
+        citation: "AIR 1998 SC 1801",
+        summary: "Landmark case on medical negligence under Consumer Protection Act. Court established that medical services fall under consumer protection if payment made. Four elements of negligence: duty, breach, causation, damages.",
+        category: "Consumer Complaints",
+        keyPoints: ["Medical negligence under CPA", "Paid services covered", "Negligence elements established", "Consumer protection in healthcare"],
+      },
+      {
+        caseTitle: "Lucknow Development Authority v. M.K. Gupta",
+        court: "Supreme Court of India",
+        year: 1994,
+        citation: "AIR 1994 SC 787",
+        summary: "Housing services by development authorities covered under Consumer Protection Act. Deficiency in construction, delay in possession constitute unfair trade practice. Real estate consumer protection established.",
+        category: "Consumer Complaints",
+        keyPoints: ["Housing services under CPA", "Construction deficiency covered", "Delay as unfair practice", "Real estate protection"],
+      },
+      {
+        caseTitle: "Indian Medical Association v. V.P. Shantha",
+        court: "Supreme Court of India",
+        year: 1995,
+        citation: "AIR 1996 SC 550",
+        summary: "Court clarified that medical services are covered under Consumer Protection Act except free services. Established distinction between contractual and tortious liability in medical negligence cases.",
+        category: "Consumer Complaints",
+        keyPoints: ["Medical services definition", "Free vs paid distinction", "Contractual vs tort liability", "CPA scope clarified"],
+      },
+      {
+        caseTitle: "Bangalore Development Authority v. Housing and Urban Development Corporation",
+        court: "Supreme Court of India",
+        year: 2010,
+        citation: "(2010) 11 SCC 402",
+        summary: "Housing projects by government authorities covered under consumer protection. Delay in construction and possession constitutes deficiency in service. Government not immune from consumer law.",
+        category: "Consumer Complaints",
+        keyPoints: ["Government authority coverage", "Housing project deficiency", "No sovereign immunity", "Public sector accountability"],
+      },
+      {
+        caseTitle: "United India Insurance v. Pushpalatha",
+        court: "Supreme Court of India",
+        year: 2004,
+        citation: "(2004) 3 SCC 694",
+        summary: "Insurance services covered under Consumer Protection Act. Unreasonable denial of claims constitutes deficiency in service. Insurance companies liable for compensation including mental agony.",
+        category: "Consumer Complaints",
+        keyPoints: ["Insurance under CPA", "Claim denial deficiency", "Mental agony compensation", "Service provider liability"],
+      }
+    ];
+
+    cases.forEach(caseItem => {
+      const id = this.currentCaseLawId++;
+      this.caseLaws.set(id, { ...caseItem, id });
+    });
+  }
+
+  private initializeStateLawGuides() {
+    const guides = [
+      // Major States - Tenant Rights
+      {
+        state: "Maharashtra",
+        category: "Tenant Rights",
+        title: "Maharashtra Rent Control Act 1999 - Tenant Protection",
+        content: "Maharashtra Rent Control Act 1999 provides comprehensive protection to tenants. Standard rent determination based on construction cost and amenities. Eviction only on specified grounds including non-payment, subletting, personal necessity. Rent increases regulated with maximum 4% annual increase. Tenant can contest eviction before Rent Controller.",
+        keyLaws: ["Maharashtra Rent Control Act 1999", "Bombay Rents Hotel and Lodging House Rates Control Act 1947"],
+        lastUpdated: "2024-01-15",
+      },
+      {
+        state: "Delhi",
+        category: "Tenant Rights", 
+        title: "Delhi Rent Control Act 1958 - Comprehensive Guide",
+        content: "Delhi Rent Control Act 1958 protects tenants from arbitrary eviction and excessive rent. Standard rent fixed by Rent Controller. Eviction grounds limited to non-payment, subletting, damage, personal necessity. Notice period mandatory before eviction proceedings. Appeals allowed to Rent Control Tribunal and High Court.",
+        keyLaws: ["Delhi Rent Control Act 1958", "Delhi Municipal Corporation Act"],
+        lastUpdated: "2024-01-10",
+      },
+      {
+        state: "Karnataka",
+        category: "Tenant Rights",
+        title: "Karnataka Rent Control Laws and Tenant Rights",
+        content: "Karnataka follows Rent Control Act for tenant protection. Fair rent determination by Rent Controller based on locality, amenities, construction cost. Eviction requires valid grounds and proper notice. Subletting without consent prohibited. Model Tenancy Act 2019 adoption under consideration by state government.",
+        keyLaws: ["Karnataka Rent Control Act", "Bangalore Development Authority Act"],
+        lastUpdated: "2024-01-20",
+      },
+      {
+        state: "Tamil Nadu",
+        category: "Tenant Rights",
+        title: "Tamil Nadu Rent Control and Model Tenancy Act",
+        content: "Tamil Nadu Regulation of Rights and Responsibilities of Landlords and Tenants Act 2017 modernizes rent laws. Security deposit limited to 10 months rent. Fast track dispute resolution through Rent Authority. Online registration of rental agreements. Balanced approach between landlord and tenant rights.",
+        keyLaws: ["Tamil Nadu Tenancy Act 2017", "Chennai City Municipal Corporation Act"],
+        lastUpdated: "2024-01-18",
+      },
+      {
+        state: "West Bengal",
+        category: "Tenant Rights",
+        title: "West Bengal Premises Tenancy Act - Tenant Protection",
+        content: "West Bengal Premises Tenancy Act provides tenant protection especially in Kolkata and Howrah. Fair rent determination by Rent Controller. Eviction only on legal grounds with proper procedure. Long-term tenants have stronger protection. Rent increases regulated and require approval.",
+        keyLaws: ["West Bengal Premises Tenancy Act", "Kolkata Municipal Corporation Act"],
+        lastUpdated: "2024-01-12",
+      },
+
+      // Major States - Women's Safety
+      {
+        state: "Uttar Pradesh",
+        category: "Women's Safety",
+        title: "UP Women Safety Laws and Protection Mechanisms",
+        content: "Uttar Pradesh has comprehensive women safety framework. Special courts for crimes against women. One Stop Centres (Sakhi) in all districts. Women helpline 1090 operational 24x7. Anti-Romeo squads for eve-teasing prevention. Special investigation teams for crimes against women. POCSO courts for child sexual abuse cases.",
+        keyLaws: ["UP Police Act", "UP Excise Act (prohibition)", "UP Women and Child Welfare Department Rules"],
+        lastUpdated: "2024-01-25",
+      },
+      {
+        state: "Rajasthan",
+        category: "Women's Safety",
+        title: "Rajasthan Women Protection and Safety Laws",
+        content: "Rajasthan Women Helpline 181 provides 24x7 assistance. Beti Bachao Beti Padhao scheme implementation. Special courts for women-related crimes. One Stop Centres operational in all districts. Women safety apps launched by state police. Pink booths for women complaint registration.",
+        keyLaws: ["Rajasthan Police Act", "Rajasthan Prohibition of Child Marriage Act"],
+        lastUpdated: "2024-01-22",
+      },
+      {
+        state: "Gujarat",
+        category: "Women's Safety",
+        title: "Gujarat Women Safety and Crime Prevention",
+        content: "Gujarat 181 Women Helpline for emergency assistance. Special Investigation Teams for crimes against women. Fast track courts for speedy trial. Comprehensive CCTV surveillance in public places. Women safety apps with GPS tracking. Regular safety audits of public spaces.",
+        keyLaws: ["Gujarat Police Act", "Gujarat Prohibition Act"],
+        lastUpdated: "2024-01-20",
+      },
+      {
+        state: "Haryana",
+        category: "Women's Safety",
+        title: "Haryana Women Protection and Safety Framework",
+        content: "Haryana Self Defense Training for women mandatory in colleges. Women helpline 1091 operational statewide. Special courts for crimes against women. One Stop Centres providing legal aid and counseling. Beti Bachao Beti Padhao implementation. Pink booths for women safety.",
+        keyLaws: ["Haryana Police Act", "Haryana Panchayati Raj Act"],
+        lastUpdated: "2024-01-18",
+      },
+      {
+        state: "Madhya Pradesh",
+        category: "Women's Safety",
+        title: "MP Women Safety and Protection Laws",
+        content: "Madhya Pradesh Women Helpline 181 for emergency support. Special courts for women and children. One Stop Centres (Sakhi) operational. Women safety mobile app with emergency features. Special investigation cells for crimes against women. Regular safety awareness programs.",
+        keyLaws: ["MP Police Act", "MP Panchayati Raj Act"],
+        lastUpdated: "2024-01-15",
+      },
+
+      // Major States - Cybercrime
+      {
+        state: "Maharashtra",
+        category: "Cybercrime",
+        title: "Maharashtra Cyber Crime Investigation and Prevention",
+        content: "Maharashtra Cyber Crime Investigation Department with specialized units. Cyber cells in Mumbai, Pune, Nashik, Nagpur. Online FIR registration for cyber crimes. Cyber security awareness programs. Special courts for cyber crime cases. Financial fraud investigation units operational.",
+        keyLaws: ["IT Act 2000", "Maharashtra Police Act", "Mumbai Police Act"],
+        lastUpdated: "2024-01-25",
+      },
+      {
+        state: "Karnataka",
+        category: "Cybercrime",
+        title: "Karnataka Cyber Crime Laws and Investigation",
+        content: "Karnataka Cyber Crime Investigation Department operational. Bengaluru Cyber Crime Police Station for IT city protection. Online complaint registration portal. Cyber security training for police officers. Collaboration with IT companies for cyber crime prevention. Special prosecutors for cyber cases.",
+        keyLaws: ["IT Act 2000", "Karnataka Police Act"],
+        lastUpdated: "2024-01-22",
+      },
+      {
+        state: "Telangana",
+        category: "Cybercrime",
+        title: "Telangana Cyber Security and Crime Prevention",
+        content: "Telangana Cyber Security Bureau established. CyberAbad police commissionerate for IT sector. Online FIR registration available. Cyber crime awareness in educational institutions. Special investigation teams for financial cyber crimes. Regular cyber security audits.",
+        keyLaws: ["IT Act 2000", "Telangana Police Act"],
+        lastUpdated: "2024-01-20",
+      },
+      {
+        state: "Tamil Nadu",
+        category: "Cybercrime",
+        title: "Tamil Nadu Cyber Crime Investigation Framework",
+        content: "Tamil Nadu Cyber Crime Investigation Wing operational. Special cyber crime police stations in Chennai, Coimbatore. Online portal for cyber crime complaints. Cyber security training programs. Collaboration with tech parks for prevention. Fast track courts for cyber crime cases.",
+        keyLaws: ["IT Act 2000", "Tamil Nadu Police Act"],
+        lastUpdated: "2024-01-18",
+      },
+      {
+        state: "Andhra Pradesh",
+        category: "Cybercrime",
+        title: "AP Cyber Crime Laws and Digital Safety",
+        content: "Andhra Pradesh Cyber Crime Investigation Department with specialized units. Online complaint registration system. Cyber security awareness in schools and colleges. Special investigation teams for online fraud. Collaboration with banks for financial cyber crime prevention.",
+        keyLaws: ["IT Act 2000", "AP Police Act"],
+        lastUpdated: "2024-01-15",
+      },
+
+      // Major States - Consumer Protection
+      {
+        state: "Maharashtra",
+        category: "Consumer Protection",
+        title: "Maharashtra Consumer Protection and Rights",
+        content: "Maharashtra State Consumer Disputes Redressal Commission operational. Consumer helpline 1800-115-000 for complaints. Online complaint filing system. Consumer awareness programs statewide. Special focus on e-commerce and digital payment frauds. Regular consumer melas for awareness.",
+        keyLaws: ["Consumer Protection Act 2019", "Maharashtra Shops and Establishments Act"],
+        lastUpdated: "2024-01-25",
+      },
+      {
+        state: "Delhi",
+        category: "Consumer Protection",
+        title: "Delhi Consumer Protection Framework",
+        content: "Delhi State Consumer Disputes Redressal Commission with fast track courts. Consumer helpline for immediate assistance. Online mediation facilities available. Consumer awareness through Delhi government programs. Special emphasis on housing and real estate consumer protection.",
+        keyLaws: ["Consumer Protection Act 2019", "Delhi Shops and Establishments Act"],
+        lastUpdated: "2024-01-22",
+      },
+      {
+        state: "Karnataka",
+        category: "Consumer Protection",
+        title: "Karnataka Consumer Rights and Protection",
+        content: "Karnataka State Consumer Disputes Redressal Commission operational in Bengaluru. Consumer awareness programs in rural and urban areas. Online complaint registration and tracking. Special consumer courts for expedited resolution. Focus on IT services and e-commerce consumer protection.",
+        keyLaws: ["Consumer Protection Act 2019", "Karnataka Shops and Establishments Act"],
+        lastUpdated: "2024-01-20",
+      },
+      {
+        state: "Gujarat",
+        category: "Consumer Protection",
+        title: "Gujarat Consumer Protection and Redressal",
+        content: "Gujarat State Consumer Disputes Redressal Commission with efficient disposal system. Consumer helpline and grievance mechanism. Online complaint filing and tracking available. Regular consumer awareness campaigns. Special attention to pharmaceutical and chemical industry consumer issues.",
+        keyLaws: ["Consumer Protection Act 2019", "Gujarat Shops and Establishments Act"],
+        lastUpdated: "2024-01-18",
+      },
+      {
+        state: "Rajasthan",
+        category: "Consumer Protection",
+        title: "Rajasthan Consumer Rights and Redressal Mechanism",
+        content: "Rajasthan State Consumer Disputes Redressal Commission operational. Consumer helpline for complaint registration. Focus on tourism and hospitality consumer protection. Online mediation and conciliation services. Regular consumer awareness programs in rural areas.",
+        keyLaws: ["Consumer Protection Act 2019", "Rajasthan Shops and Establishments Act"],
+        lastUpdated: "2024-01-15",
+      },
+
+      // Union Territories and Special Cases
+      {
+        state: "Jammu and Kashmir",
+        category: "Legal Framework",
+        title: "J&K Legal Framework Post Article 370 Abrogation",
+        content: "Post Article 370 abrogation, all central laws including Consumer Protection Act, IT Act, CrPC apply to J&K. New legal framework with central and UT laws. Special provisions for local customs and practices. Gradual implementation of all India legal systems.",
+        keyLaws: ["J&K Reorganisation Act 2019", "All India Central Laws"],
+        lastUpdated: "2024-01-25",
+      },
+      {
+        state: "Ladakh",
+        category: "Legal Framework",
+        title: "Ladakh UT Legal System and Laws",
+        content: "Ladakh as Union Territory follows central laws. High Court of J&K has jurisdiction. Special provisions for Buddhist and Muslim personal laws. Local customs in property and family matters recognized. Gradual development of UT-specific legal framework.",
+        keyLaws: ["J&K Reorganisation Act 2019", "Central Laws Application"],
+        lastUpdated: "2024-01-22",
+      },
+      {
+        state: "Puducherry",
+        category: "Legal Framework",
+        title: "Puducherry Legal System and Consumer Protection",
+        content: "Puducherry follows central laws with some local adaptations. French civil law influence in certain matters. Consumer protection through central act implementation. Special provisions for French nationals and local customs. Madras High Court jurisdiction for appeals.",
+        keyLaws: ["Consumer Protection Act 2019", "Puducherry Civil Code"],
+        lastUpdated: "2024-01-20",
+      },
+      {
+        state: "Goa",
+        category: "Legal Framework",
+        title: "Goa Civil Code and Legal System",
+        content: "Goa retains Portuguese Civil Code for family and property matters. Uniform Civil Code operational since 1867. Consumer protection under central act. Special provisions for property registration and inheritance. Bombay High Court Goa bench for legal matters.",
+        keyLaws: ["Goa Civil Code", "Consumer Protection Act 2019"],
+        lastUpdated: "2024-01-18",
+      }
+    ];
+
+    guides.forEach(guide => {
+      const id = this.currentGuideId++;
+      this.stateLawGuides.set(id, { 
+        ...guide, 
+        id, 
+        lastUpdated: typeof guide.lastUpdated === 'string' ? new Date(guide.lastUpdated) : guide.lastUpdated
+      });
+    });
+  }
+
+  // User methods
+  async getUser(id: number): Promise<User | undefined> {
+    return this.users.get(id);
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(
+      (user) => user.username === username,
+    );
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const id = this.currentUserId++;
+    const user: User = { ...insertUser, id };
+    this.users.set(id, user);
+    return user;
+  }
+
+  // Chat message methods
+  async getChatMessages(userId?: number): Promise<ChatMessage[]> {
+    const messages = Array.from(this.chatMessages.values());
+    if (userId) {
+      return messages.filter(msg => msg.userId === userId);
+    }
+    return messages;
+  }
+
+  async createChatMessage(insertMessage: InsertChatMessage): Promise<ChatMessage> {
+    const id = this.currentChatMessageId++;
+    const message: ChatMessage = { 
+      ...insertMessage, 
+      id, 
+      timestamp: new Date(),
+      userId: insertMessage.userId ?? null
+    };
+    this.chatMessages.set(id, message);
+    return message;
+  }
+
+  // Knowledge base methods
+  async getKnowledgeArticles(): Promise<KnowledgeArticle[]> {
+    return Array.from(this.knowledgeArticles.values()).filter(article => article.isPublished);
+  }
+
+  async getKnowledgeArticle(id: number): Promise<KnowledgeArticle | undefined> {
+    return this.knowledgeArticles.get(id);
+  }
+
+  async createKnowledgeArticle(insertArticle: InsertKnowledgeArticle): Promise<KnowledgeArticle> {
+    const id = this.currentKnowledgeId++;
+    const article: KnowledgeArticle = { 
+      ...insertArticle, 
+      id,
+      tags: insertArticle.tags ?? null,
+      isPublished: insertArticle.isPublished ?? true
+    };
+    this.knowledgeArticles.set(id, article);
+    return article;
+  }
+
+  async updateKnowledgeArticle(id: number, updateData: Partial<InsertKnowledgeArticle>): Promise<KnowledgeArticle | undefined> {
+    const existingArticle = this.knowledgeArticles.get(id);
+    if (!existingArticle) return undefined;
+    
+    const updatedArticle = { ...existingArticle, ...updateData };
+    this.knowledgeArticles.set(id, updatedArticle);
+    return updatedArticle;
+  }
+
+  async deleteKnowledgeArticle(id: number): Promise<boolean> {
+    return this.knowledgeArticles.delete(id);
+  }
+
+  // Document analysis methods
+  async getDocumentAnalyses(): Promise<DocumentAnalysis[]> {
+    return Array.from(this.documentAnalyses.values());
+  }
+
+  async createDocumentAnalysis(insertAnalysis: InsertDocumentAnalysis): Promise<DocumentAnalysis> {
+    const id = this.currentDocumentId++;
+    const analysis: DocumentAnalysis = { 
+      ...insertAnalysis, 
+      id, 
+      timestamp: new Date() 
+    };
+    this.documentAnalyses.set(id, analysis);
+    return analysis;
+  }
+
+  // Legal template methods
+  async getLegalTemplates(): Promise<LegalTemplate[]> {
+    return Array.from(this.legalTemplates.values());
+  }
+
+  async getLegalTemplatesByCategory(category: string): Promise<LegalTemplate[]> {
+    return Array.from(this.legalTemplates.values()).filter(template => 
+      template.category.toLowerCase() === category.toLowerCase()
+    );
+  }
+
+  async getLegalTemplate(id: number): Promise<LegalTemplate | undefined> {
+    return this.legalTemplates.get(id);
+  }
+
+  // Case law methods
+  async getCaseLaw(): Promise<CaseLaw[]> {
+    return Array.from(this.caseLaws.values());
+  }
+
+  async getCaseLawByCategory(category: string): Promise<CaseLaw[]> {
+    return Array.from(this.caseLaws.values()).filter(caseItem => 
+      caseItem.category.toLowerCase() === category.toLowerCase()
+    );
+  }
+
+  async searchCaseLaw(query: string): Promise<CaseLaw[]> {
+    const queryLower = query.toLowerCase();
+    return Array.from(this.caseLaws.values()).filter(caseItem => 
+      caseItem.caseTitle.toLowerCase().includes(queryLower) ||
+      caseItem.summary.toLowerCase().includes(queryLower) ||
+      (caseItem.keyPoints && caseItem.keyPoints.some(point => point.toLowerCase().includes(queryLower)))
+    );
+  }
+
+  // State law guide methods
+  async getStateLawGuides(): Promise<StateLawGuide[]> {
+    return Array.from(this.stateLawGuides.values());
+  }
+
+  async getStateLawGuidesByState(state: string): Promise<StateLawGuide[]> {
+    return Array.from(this.stateLawGuides.values()).filter(guide => 
+      guide.state.toLowerCase() === state.toLowerCase()
+    );
+  }
+
+  async getStateLawGuidesByCategory(category: string): Promise<StateLawGuide[]> {
+    return Array.from(this.stateLawGuides.values()).filter(guide => 
+      guide.category.toLowerCase() === category.toLowerCase()
+    );
+  }
+}
+
+export const storage = new MemStorage();

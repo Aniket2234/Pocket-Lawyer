@@ -28,8 +28,8 @@ export default function CaseLawPage() {
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Case Law Database</h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Browse 50 landmark Supreme Court cases organized across 5 legal categories. 
-            Each category contains 10 important cases with detailed analysis.
+            Browse 15 landmark Supreme Court cases organized across 5 legal categories. 
+            Each category contains 3 important real-time cases with detailed analysis.
           </p>
         </div>
 
@@ -85,14 +85,14 @@ export default function CaseLawPage() {
                   <>
                     <h2 className="font-semibold text-blue-900 mb-1">All Categories</h2>
                     <p className="text-sm text-blue-700">
-                      Showing all {cases?.length || 0} landmark Supreme Court cases across 5 categories
+                      Showing all {cases?.length || 0} landmark Supreme Court cases across 5 categories (3 cases per category)
                     </p>
                   </>
                 ) : (
                   <>
                     <h2 className="font-semibold text-blue-900 mb-1">{selectedCategory}</h2>
                     <p className="text-sm text-blue-700">
-                      Showing {cases?.length || 0} cases in this category (exactly 10 cases per category)
+                      Showing {cases?.length || 0} cases in this category (exactly 3 cases per category)
                     </p>
                   </>
                 )}

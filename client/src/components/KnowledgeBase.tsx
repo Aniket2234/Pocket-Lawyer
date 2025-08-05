@@ -54,7 +54,7 @@ export default function KnowledgeBase() {
       title: 'Case Law Database',
       description: 'Browse landmark Supreme Court cases across 5 key legal categories.',
       icon: Scale,
-      count: '50 Cases (10 per category)',
+      count: '15 Cases (3 per category)',
     },
     {
       title: 'State Law Guides',
