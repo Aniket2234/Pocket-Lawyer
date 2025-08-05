@@ -1,8 +1,169 @@
-import React from 'react';
-import { MessageCircle, Shield, Zap, Users } from 'lucide-react';
+import React, { useState } from 'react';
+import { MessageCircle, Shield, Zap, Users, Play, X } from 'lucide-react';
 
 interface HeroProps {
   onGetStarted: () => void;
+}
+
+function DemoButton() {
+  const [showDemo, setShowDemo] = useState(false);
+
+  const handleDemoClick = () => {
+    setShowDemo(true);
+  };
+
+  return (
+    <>
+      <button onClick={handleDemoClick} className="btn-secondary flex items-center space-x-2">
+        <Play className="h-4 w-4" />
+        <span>Watch Demo</span>
+      </button>
+
+      {/* Demo Modal */}
+      {showDemo && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden">
+            <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+              <h3 className="text-lg font-semibold">AI Legal Assistant Demo</h3>
+              <button
+                onClick={() => setShowDemo(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+            <div className="p-6">
+              <DemoConversation onClose={() => setShowDemo(false)} />
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+function DemoConversation({ onClose }: { onClose: () => void }) {
+  const [currentStep, setCurrentStep] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  const demoSteps = [
+    {
+      type: 'user',
+      message: 'I received an eviction notice but I think it might be illegal. What should I do?',
+      delay: 1000,
+    },
+    {
+      type: 'bot',
+      message: 'I understand your concern about the eviction notice. Let me help you understand your rights as a tenant. First, can you tell me what state you\'re in and what reason was given for the eviction?',
+      delay: 2000,
+    },
+    {
+      type: 'user', 
+      message: 'I\'m in California, and they say it\'s for non-payment of rent, but I paid on time last month.',
+      delay: 1500,
+    },
+    {
+      type: 'bot',
+      message: 'In California, landlords must follow strict procedures for eviction. If you paid rent on time, this could be wrongful eviction. Here\'s what you should do:\n\n1. Gather all payment records and receipts\n2. Check if proper notice was given (usually 3-day notice for non-payment)\n3. Respond within the notice period\n4. Consider contacting a tenant rights organization\n\nWould you like me to help you find local tenant assistance resources?',
+      delay: 3000,
+    },
+    {
+      type: 'user',
+      message: 'Yes, that would be very helpful. I need to respond quickly.',
+      delay: 1000,
+    },
+    {
+      type: 'bot',
+      message: 'Absolutely! Here are some immediate resources for California tenants:\n\n• California Department of Consumer Affairs - Tenant Rights\n• Local Legal Aid Society\n• Tenant Union in your city\n\nI\'ve also found template letters you can use to respond to the eviction notice. Remember, you typically have 5 days to respond in court. Would you like me to help you draft a response letter?',
+      delay: 2500,
+    }
+  ];
+
+  const startDemo = () => {
+    setIsPlaying(true);
+    setCurrentStep(0);
+    
+    const showNextStep = (index: number) => {
+      if (index < demoSteps.length) {
+        setTimeout(() => {
+          setCurrentStep(index + 1);
+          showNextStep(index + 1);
+        }, demoSteps[index].delay);
+      } else {
+        setIsPlaying(false);
+      }
+    };
+    
+    showNextStep(0);
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="text-center">
+        <p className="text-gray-600 mb-4">
+          See how our AI legal assistant helps with real tenant rights questions
+        </p>
+        {!isPlaying && currentStep === 0 && (
+          <button onClick={startDemo} className="btn-primary">
+            Start Demo Conversation
+          </button>
+        )}
+      </div>
+
+      <div className="bg-gray-50 rounded-lg p-6 min-h-[400px] max-h-[500px] overflow-y-auto">
+        <div className="space-y-4">
+          {demoSteps.slice(0, currentStep).map((step, index) => (
+            <div
+              key={index}
+              className={`flex ${step.type === 'user' ? 'justify-end' : 'justify-start'}`}
+            >
+              <div
+                className={`max-w-[80%] p-3 rounded-lg ${
+                  step.type === 'user'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-white border border-gray-200'
+                }`}
+              >
+                <div className={`text-xs mb-1 ${step.type === 'user' ? 'text-blue-100' : 'text-gray-500'}`}>
+                  {step.type === 'user' ? 'You' : 'AI Legal Assistant'}
+                </div>
+                <p className="text-sm whitespace-pre-wrap">{step.message}</p>
+              </div>
+            </div>
+          ))}
+          
+          {isPlaying && currentStep < demoSteps.length && (
+            <div className="flex justify-start">
+              <div className="bg-white border border-gray-200 p-3 rounded-lg">
+                <div className="flex items-center space-x-2">
+                  <div className="flex space-x-1">
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                  </div>
+                  <span className="text-xs text-gray-500">AI is typing...</span>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {currentStep === demoSteps.length && (
+        <div className="text-center space-y-4">
+          <p className="text-green-600 font-medium">Demo Complete!</p>
+          <div className="flex justify-center space-x-4">
+            <button onClick={startDemo} className="btn-secondary">
+              Watch Again
+            </button>
+            <button onClick={onClose} className="btn-primary">
+              Try It Yourself
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function Hero({ onGetStarted }: HeroProps) {
@@ -35,9 +196,7 @@ export default function Hero({ onGetStarted }: HeroProps) {
               <MessageCircle className="h-5 w-5" />
               <span>Start Chat Now</span>
             </button>
-            <button className="btn-secondary">
-              <span>Watch Demo</span>
-            </button>
+            <DemoButton />
           </div>
 
           {/* Trust Indicators */}

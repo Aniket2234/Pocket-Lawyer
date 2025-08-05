@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Search, Book, FileText, Scale, Building, Heart, Car, Home, Briefcase, Shield } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { Search, Book, FileText, Scale, Building, Heart, Car, Home, Briefcase, Shield, User, ShoppingCart } from 'lucide-react';
 
 export default function KnowledgeBase() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -7,70 +8,22 @@ export default function KnowledgeBase() {
 
   const categories = [
     { id: 'all', name: 'All Topics', icon: Book, color: 'bg-gray-500' },
-    { id: 'business', name: 'Business Law', icon: Building, color: 'bg-blue-500' },
-    { id: 'family', name: 'Family Law', icon: Heart, color: 'bg-pink-500' },
-    { id: 'personal-injury', name: 'Personal Injury', icon: Car, color: 'bg-red-500' },
-    { id: 'real-estate', name: 'Real Estate', icon: Home, color: 'bg-green-500' },
-    { id: 'employment', name: 'Employment', icon: Briefcase, color: 'bg-purple-500' },
-    { id: 'criminal', name: 'Criminal Defense', icon: Shield, color: 'bg-orange-500' },
+    { id: 'Arrest Rights', name: 'Arrest Rights', icon: Shield, color: 'bg-red-500' },
+    { id: 'Tenant Rights', name: 'Tenant Rights', icon: Home, color: 'bg-blue-500' },
+    { id: 'Cybercrime', name: 'Cybercrime', icon: Shield, color: 'bg-purple-500' },
+    { id: 'Women\'s Safety', name: 'Women\'s Safety', icon: User, color: 'bg-pink-500' },
+    { id: 'Consumer Complaints', name: 'Consumer Complaints', icon: ShoppingCart, color: 'bg-green-500' },
   ];
 
-  const articles = [
-    {
-      id: 1,
-      title: 'Understanding Contract Basics: What Makes an Agreement Legally Binding',
-      excerpt: 'Learn the essential elements of a valid contract including offer, acceptance, consideration, and capacity.',
-      category: 'business',
-      readTime: '5 min read',
-      difficulty: 'Beginner',
-      tags: ['Contracts', 'Business Law', 'Legal Basics'],
-    },
-    {
-      id: 2,
-      title: 'Tenant Rights and Responsibilities: A Complete Guide',
-      excerpt: 'Comprehensive overview of tenant rights, security deposits, lease agreements, and eviction procedures.',
-      category: 'real-estate',
-      readTime: '8 min read',  
-      difficulty: 'Intermediate',
-      tags: ['Landlord-Tenant', 'Property Rights', 'Housing'],
-    },
-    {
-      id: 3,
-      title: 'Starting an LLC: Step-by-Step Business Formation Guide',
-      excerpt: 'Everything you need to know about forming a Limited Liability Company, from paperwork to tax implications.',
-      category: 'business',
-      readTime: '10 min read',
-      difficulty: 'Intermediate',
-      tags: ['LLC', 'Business Formation', 'Entrepreneurship'],
-    },
-    {
-      id: 4,
-      title: 'Divorce Process: What to Expect and How to Prepare',
-      excerpt: 'Navigate the divorce process with confidence. Learn about asset division, custody, and legal requirements.',
-      category: 'family',
-      readTime: '12 min read',
-      difficulty: 'Advanced',
-      tags: ['Divorce', 'Child Custody', 'Family Court'],
-    },
-    {
-      id: 5,
-      title: 'Workplace Harassment: Know Your Rights and Legal Options',
-      excerpt: 'Understanding workplace harassment laws, reporting procedures, and legal remedies available to employees.',
-      category: 'employment',
-      readTime: '7 min read',
-      difficulty: 'Intermediate',
-      tags: ['Harassment', 'Employment Rights', 'Workplace Law'],
-    },
-    {
-      id: 6,
-      title: 'Car Accident Claims: Maximizing Your Personal Injury Settlement',
-      excerpt: 'Essential steps to take after a car accident and how to work with insurance companies and attorneys.',
-      category: 'personal-injury',
-      readTime: '9 min read',
-      difficulty: 'Intermediate',
-      tags: ['Car Accidents', 'Insurance Claims', 'Personal Injury'],
-    },
-  ];
+  const { data: articles, isLoading } = useQuery({
+    queryKey: ['/api/knowledge'],
+  });
+
+  const filteredArticles = articles?.filter((article: any) =>
+    (selectedCategory === 'all' || article.category === selectedCategory) &&
+    (article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+     article.content.toLowerCase().includes(searchQuery.toLowerCase()))
+  ) || [];
 
   const featuredResources = [
     {
@@ -93,13 +46,7 @@ export default function KnowledgeBase() {
     },
   ];
 
-  const filteredArticles = articles.filter(article => {
-    const matchesSearch = article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         article.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         article.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
-    const matchesCategory = selectedCategory === 'all' || article.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-8">
@@ -176,7 +123,7 @@ export default function KnowledgeBase() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {filteredArticles.map((article) => (
+            {filteredArticles.map((article: any) => (
               <article key={article.id} className="card p-8 hover:scale-105 transition-all duration-300">
                 <div className="flex items-center space-x-4 mb-4">
                   <span className={`px-3 py-1 rounded-full text-xs font-medium ${
@@ -198,7 +145,7 @@ export default function KnowledgeBase() {
                 </p>
 
                 <div className="flex flex-wrap gap-2 mb-4">
-                  {article.tags.map((tag, index) => (
+                  {article.tags?.map((tag: string, index: number) => (
                     <span
                       key={index}
                       className="px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded-md font-medium"

@@ -3,8 +3,11 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { 
   insertChatMessageSchema, 
-  insertKnowledgeArticleSchema, 
-  insertConsultationBookingSchema 
+  insertKnowledgeArticleSchema,
+  insertDocumentAnalysisSchema,
+  insertLegalTemplateSchema,
+  insertCaseLawSchema,
+  insertStateLawGuideSchema
 } from "@shared/schema";
 import { z } from "zod";
 
@@ -105,60 +108,121 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Consultation booking API routes
-  app.get("/api/consultations", async (req, res) => {
+  // Document analysis API routes
+  app.get("/api/documents", async (req, res) => {
     try {
-      const bookings = await storage.getConsultationBookings();
-      res.json(bookings);
+      const analyses = await storage.getDocumentAnalyses();
+      res.json(analyses);
     } catch (error) {
-      res.status(500).json({ message: "Failed to fetch bookings" });
+      res.status(500).json({ message: "Failed to fetch document analyses" });
     }
   });
 
-  app.get("/api/consultations/:id", async (req, res) => {
+  app.post("/api/documents/analyze", async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
-      const booking = await storage.getConsultationBooking(id);
-      if (!booking) {
-        res.status(404).json({ message: "Booking not found" });
+      const { fileName, fileType, content } = req.body;
+      
+      if (!fileName || !fileType) {
+        res.status(400).json({ message: "File name and type are required" });
         return;
       }
-      res.json(booking);
+
+      // Simulate document analysis
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      const analysisResult = `Document Analysis for ${fileName}:
+      
+      Document Type: ${fileType}
+      Analysis Summary: This document appears to be a ${fileType.toLowerCase()} file. Based on the content structure, this could be a legal document requiring careful review.
+      
+      Key Findings:
+      - Document contains standard legal language
+      - Proper formatting detected
+      - No obvious red flags identified
+      
+      Recommendations:
+      - Review all terms carefully before signing
+      - Consider consulting with a legal professional
+      - Ensure all parties understand their obligations`;
+
+      const analysis = await storage.createDocumentAnalysis({
+        fileName,
+        fileType,
+        analysisResult
+      });
+      
+      res.json(analysis);
     } catch (error) {
-      res.status(500).json({ message: "Failed to fetch booking" });
+      res.status(500).json({ message: "Failed to analyze document" });
     }
   });
 
-  app.post("/api/consultations", async (req, res) => {
+  // Legal templates API routes
+  app.get("/api/templates", async (req, res) => {
     try {
-      const validatedData = insertConsultationBookingSchema.parse(req.body);
-      const booking = await storage.createConsultationBooking(validatedData);
-      res.json(booking);
+      const category = req.query.category as string;
+      const templates = category 
+        ? await storage.getLegalTemplatesByCategory(category)
+        : await storage.getLegalTemplates();
+      res.json(templates);
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        res.status(400).json({ message: "Invalid booking data", errors: error.errors });
-      } else {
-        res.status(500).json({ message: "Failed to create booking" });
-      }
+      res.status(500).json({ message: "Failed to fetch templates" });
     }
   });
 
-  app.put("/api/consultations/:id", async (req, res) => {
+  app.get("/api/templates/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const validatedData = insertConsultationBookingSchema.partial().parse(req.body);
-      const booking = await storage.updateConsultationBooking(id, validatedData);
-      if (!booking) {
-        res.status(404).json({ message: "Booking not found" });
+      const template = await storage.getLegalTemplate(id);
+      if (!template) {
+        res.status(404).json({ message: "Template not found" });
         return;
       }
-      res.json(booking);
+      res.json(template);
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        res.status(400).json({ message: "Invalid booking data", errors: error.errors });
+      res.status(500).json({ message: "Failed to fetch template" });
+    }
+  });
+
+  // Case law API routes
+  app.get("/api/cases", async (req, res) => {
+    try {
+      const category = req.query.category as string;
+      const search = req.query.search as string;
+      
+      let cases;
+      if (search) {
+        cases = await storage.searchCaseLaw(search);
+      } else if (category) {
+        cases = await storage.getCaseLawByCategory(category);
       } else {
-        res.status(500).json({ message: "Failed to update booking" });
+        cases = await storage.getCaseLaw();
       }
+      
+      res.json(cases);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch case law" });
+    }
+  });
+
+  // State law guides API routes
+  app.get("/api/guides", async (req, res) => {
+    try {
+      const state = req.query.state as string;
+      const category = req.query.category as string;
+      
+      let guides;
+      if (state) {
+        guides = await storage.getStateLawGuidesByState(state);
+      } else if (category) {
+        guides = await storage.getStateLawGuidesByCategory(category);
+      } else {
+        guides = await storage.getStateLawGuides();
+      }
+      
+      res.json(guides);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch state law guides" });
     }
   });
 

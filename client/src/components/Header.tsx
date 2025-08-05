@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'wouter';
-import { Scale, MessageCircle, Book, Calendar, Menu, X } from 'lucide-react';
+import { Scale, MessageCircle, Book, FileText, Menu, X } from 'lucide-react';
 
 interface HeaderProps {
   activeSection: string;
@@ -13,7 +13,7 @@ export default function Header({ activeSection }: HeaderProps) {
     { id: 'home', label: 'Home', icon: Scale, path: '/' },
     { id: 'chat', label: 'AI Chat', icon: MessageCircle, path: '/chat' },
     { id: 'knowledge', label: 'Knowledge Base', icon: Book, path: '/knowledge' },
-    { id: 'consultation', label: 'Consultation', icon: Calendar, path: '/consultation' },
+    { id: 'documents', label: 'Document Analysis', icon: FileText, path: '/documents' },
   ];
 
   return (

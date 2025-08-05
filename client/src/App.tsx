@@ -3,7 +3,10 @@ import Header from './components/Header';
 import HomePage from './pages/HomePage';
 import ChatPage from './pages/ChatPage';
 import KnowledgePage from './pages/KnowledgePage';
-import ConsultationPage from './pages/ConsultationPage';
+import DocumentAnalysisPage from './pages/DocumentAnalysisPage';
+import LegalTemplatesPage from './pages/LegalTemplatesPage';
+import CaseLawPage from './pages/CaseLawPage';
+import StateLawGuidesPage from './pages/StateLawGuidesPage';
 import Footer from './components/Footer';
 
 function App() {
@@ -13,7 +16,10 @@ function App() {
   const getActiveSection = () => {
     if (location.startsWith('/chat')) return 'chat';
     if (location.startsWith('/knowledge')) return 'knowledge';
-    if (location.startsWith('/consultation')) return 'consultation';
+    if (location.startsWith('/documents')) return 'documents';
+    if (location.startsWith('/templates')) return 'templates';
+    if (location.startsWith('/cases')) return 'cases';
+    if (location.startsWith('/guides')) return 'guides';
     return 'home';
   };
 
@@ -25,7 +31,10 @@ function App() {
           <Route path="/" component={HomePage} />
           <Route path="/chat" component={ChatPage} />
           <Route path="/knowledge" component={KnowledgePage} />
-          <Route path="/consultation" component={ConsultationPage} />
+          <Route path="/documents" component={DocumentAnalysisPage} />
+          <Route path="/templates" component={LegalTemplatesPage} />
+          <Route path="/cases" component={CaseLawPage} />
+          <Route path="/guides" component={StateLawGuidesPage} />
         </main>
         <Footer />
       </div>
