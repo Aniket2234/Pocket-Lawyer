@@ -52,9 +52,9 @@ export default function KnowledgeBase() {
     },
     {
       title: 'Case Law Database',
-      description: 'Search through thousands of relevant court cases and legal precedents.',
+      description: 'Browse landmark Supreme Court cases across 5 key legal categories.',
       icon: Scale,
-      count: '10,000+ Cases',
+      count: '50 Cases (10 per category)',
     },
     {
       title: 'State Law Guides',
