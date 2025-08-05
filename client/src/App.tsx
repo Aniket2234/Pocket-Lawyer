@@ -1,41 +1,35 @@
-import React, { useState } from 'react';
+import { Router, Route, useLocation } from 'wouter';
 import Header from './components/Header';
-import Hero from './components/Hero';
-import Features from './components/Features';
-import ChatInterface from './components/ChatInterface';
-import KnowledgeBase from './components/KnowledgeBase';
-import ConsultationBooking from './components/ConsultationBooking';
+import HomePage from './pages/HomePage';
+import ChatPage from './pages/ChatPage';
+import KnowledgePage from './pages/KnowledgePage';
+import ConsultationPage from './pages/ConsultationPage';
 import Footer from './components/Footer';
 
 function App() {
-  const [activeSection, setActiveSection] = useState('home');
-
-  const renderSection = () => {
-    switch (activeSection) {
-      case 'chat':
-        return <ChatInterface />;
-      case 'knowledge':
-        return <KnowledgeBase />;
-      case 'consultation':
-        return <ConsultationBooking />;
-      default:
-        return (
-          <>
-            <Hero onGetStarted={() => setActiveSection('chat')} />
-            <Features />
-          </>
-        );
-    }
+  const [location] = useLocation();
+  
+  // Determine active section from current route
+  const getActiveSection = () => {
+    if (location.startsWith('/chat')) return 'chat';
+    if (location.startsWith('/knowledge')) return 'knowledge';
+    if (location.startsWith('/consultation')) return 'consultation';
+    return 'home';
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      <Header activeSection={activeSection} onSectionChange={setActiveSection} />
-      <main className="pt-16">
-        {renderSection()}
-      </main>
-      <Footer />
-    </div>
+    <Router>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+        <Header activeSection={getActiveSection()} />
+        <main className="pt-16">
+          <Route path="/" component={HomePage} />
+          <Route path="/chat" component={ChatPage} />
+          <Route path="/knowledge" component={KnowledgePage} />
+          <Route path="/consultation" component={ConsultationPage} />
+        </main>
+        <Footer />
+      </div>
+    </Router>
   );
 }
 

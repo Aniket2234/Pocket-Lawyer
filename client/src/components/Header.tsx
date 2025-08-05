@@ -1,19 +1,19 @@
 import React from 'react';
+import { Link } from 'wouter';
 import { Scale, MessageCircle, Book, Calendar, Menu, X } from 'lucide-react';
 
 interface HeaderProps {
   activeSection: string;
-  onSectionChange: (section: string) => void;
 }
 
-export default function Header({ activeSection, onSectionChange }: HeaderProps) {
+export default function Header({ activeSection }: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 
   const navItems = [
-    { id: 'home', label: 'Home', icon: Scale },
-    { id: 'chat', label: 'AI Chat', icon: MessageCircle },
-    { id: 'knowledge', label: 'Knowledge Base', icon: Book },
-    { id: 'consultation', label: 'Consultation', icon: Calendar },
+    { id: 'home', label: 'Home', icon: Scale, path: '/' },
+    { id: 'chat', label: 'AI Chat', icon: MessageCircle, path: '/chat' },
+    { id: 'knowledge', label: 'Knowledge Base', icon: Book, path: '/knowledge' },
+    { id: 'consultation', label: 'Consultation', icon: Calendar, path: '/consultation' },
   ];
 
   return (
@@ -21,10 +21,7 @@ export default function Header({ activeSection, onSectionChange }: HeaderProps) 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div 
-            className="flex items-center space-x-2 cursor-pointer group"
-            onClick={() => onSectionChange('home')}
-          >
+          <Link href="/" className="flex items-center space-x-2 cursor-pointer group">
             <div className="p-2 bg-gradient-to-br from-blue-600 to-emerald-600 rounded-lg group-hover:scale-110 transition-transform duration-200">
               <Scale className="h-6 w-6 text-white" />
             </div>
@@ -32,16 +29,16 @@ export default function Header({ activeSection, onSectionChange }: HeaderProps) 
               <h1 className="text-xl font-bold gradient-text">Pocket Lawyer</h1>
               <p className="text-xs text-gray-600 -mt-1">AI Legal Assistant</p>
             </div>
-          </div>
+          </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-1">
             {navItems.map((item) => {
               const Icon = item.icon;
               return (
-                <button
+                <Link
                   key={item.id}
-                  onClick={() => onSectionChange(item.id)}
+                  href={item.path}
                   className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
                     activeSection === item.id
                       ? 'bg-blue-600 text-white shadow-lg'
@@ -50,7 +47,7 @@ export default function Header({ activeSection, onSectionChange }: HeaderProps) 
                 >
                   <Icon className="h-4 w-4" />
                   <span>{item.label}</span>
-                </button>
+                </Link>
               );
             })}
           </nav>
@@ -71,12 +68,10 @@ export default function Header({ activeSection, onSectionChange }: HeaderProps) 
               {navItems.map((item) => {
                 const Icon = item.icon;
                 return (
-                  <button
+                  <Link
                     key={item.id}
-                    onClick={() => {
-                      onSectionChange(item.id);
-                      setIsMenuOpen(false);
-                    }}
+                    href={item.path}
+                    onClick={() => setIsMenuOpen(false)}
                     className={`flex items-center space-x-3 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
                       activeSection === item.id
                         ? 'bg-blue-600 text-white shadow-lg'
@@ -85,7 +80,7 @@ export default function Header({ activeSection, onSectionChange }: HeaderProps) 
                   >
                     <Icon className="h-5 w-5" />
                     <span>{item.label}</span>
-                  </button>
+                  </Link>
                 );
               })}
             </nav>
