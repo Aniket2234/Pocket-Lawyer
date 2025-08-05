@@ -486,7 +486,7 @@ export class MemStorage implements IStorage {
     return Array.from(this.caseLaws.values()).filter(caseItem => 
       caseItem.caseTitle.toLowerCase().includes(queryLower) ||
       caseItem.summary.toLowerCase().includes(queryLower) ||
-      caseItem.keyPoints.some(point => point.toLowerCase().includes(queryLower))
+      (caseItem.keyPoints && caseItem.keyPoints.some(point => point.toLowerCase().includes(queryLower)))
     );
   }
 
