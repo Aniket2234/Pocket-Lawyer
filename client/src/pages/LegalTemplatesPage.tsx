@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { FileText, Search, Download, Filter } from 'lucide-react';
+import type { LegalTemplate } from '../../../shared/schema';
 
 const categories = [
   'All Categories',
@@ -23,20 +24,20 @@ const categories = [
 export default function LegalTemplatesPage() {
   const [selectedCategory, setSelectedCategory] = useState('All Categories');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedTemplate, setSelectedTemplate] = useState<any>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<LegalTemplate | null>(null);
 
-  const { data: templates = [], isLoading } = useQuery({
+  const { data: templates = [], isLoading } = useQuery<LegalTemplate[]>({
     queryKey: selectedCategory === 'All Categories' 
       ? ['/api/templates'] 
       : ['/api/templates', { category: selectedCategory }],
   });
 
-  const filteredTemplates = templates.filter((template: any) =>
+  const filteredTemplates = templates.filter((template: LegalTemplate) =>
     template.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     template.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleDownload = (template: any) => {
+  const handleDownload = (template: LegalTemplate) => {
     const blob = new Blob([template.content], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -52,7 +53,7 @@ export default function LegalTemplatesPage() {
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Legal Templates</h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Access 50+ professional legal templates for common situations. 
+            Access 20+ professional legal templates for common situations. 
             Customize and download for your specific needs.
           </p>
         </div>
@@ -109,7 +110,7 @@ export default function LegalTemplatesPage() {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {filteredTemplates.map((template: any) => (
+                {filteredTemplates.map((template: LegalTemplate) => (
                   <div key={template.id} className="card p-6 hover:shadow-lg transition-shadow">
                     <div className="flex items-start justify-between mb-4">
                       <div>

@@ -128,15 +128,29 @@ export default function KnowledgeBase() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
           {featuredResources.map((resource, index) => {
             const Icon = resource.icon;
+            const getResourceLink = () => {
+              if (resource.title === 'Legal Document Templates') return '/templates';
+              if (resource.title === 'Case Law Database') return '/cases';
+              if (resource.title === 'State Law Guides') return '/guides';
+              return '#';
+            };
+            
             return (
-              <div key={index} className="card p-6 text-center hover:scale-105 transition-all duration-300">
+              <Link
+                key={index}
+                href={getResourceLink()}
+                className="card p-6 text-center hover:scale-105 transition-all duration-300 cursor-pointer block"
+              >
                 <div className="inline-flex p-4 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-xl mb-4">
                   <Icon className="h-8 w-8 text-white" />
                 </div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">{resource.title}</h3>
                 <p className="text-gray-600 mb-4">{resource.description}</p>
-                <div className="text-sm font-medium text-blue-600">{resource.count}</div>
-              </div>
+                <div className="text-sm font-medium text-blue-600 flex items-center justify-center gap-1">
+                  {resource.count}
+                  <ArrowRight className="h-4 w-4" />
+                </div>
+              </Link>
             );
           })}
         </div>
