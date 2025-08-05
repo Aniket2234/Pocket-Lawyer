@@ -15,12 +15,7 @@ export default function Features() {
       description: 'Upload contracts, agreements, and legal documents for AI-powered analysis and risk assessment.',
       color: 'from-emerald-500 to-emerald-600',
     },
-    {
-      icon: Users,
-      title: 'Expert Consultation',
-      description: 'Connect with licensed attorneys for professional legal advice when you need human expertise.',
-      color: 'from-orange-500 to-orange-600',
-    },
+
     {
       icon: Brain,
       title: 'Legal Knowledge Base',
