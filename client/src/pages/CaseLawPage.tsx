@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Search, Scale, BookOpen, Filter } from 'lucide-react';
+import { Search, Scale, BookOpen, Filter, ArrowLeft, Calendar, Building2 } from 'lucide-react';
 
 const categories = [
   'All Categories',
@@ -14,6 +14,7 @@ const categories = [
 export default function CaseLawPage() {
   const [selectedCategory, setSelectedCategory] = useState('All Categories');
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCase, setSelectedCase] = useState<any>(null);
 
   const { data: cases, isLoading } = useQuery({
     queryKey: ['/api/cases', { 
@@ -21,6 +22,90 @@ export default function CaseLawPage() {
       search: searchQuery || undefined 
     }],
   });
+
+  // If a case is selected, show the detailed view
+  if (selectedCase) {
+    return (
+      <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto">
+          {/* Back Button */}
+          <button
+            onClick={() => setSelectedCase(null)}
+            className="flex items-center text-blue-600 hover:text-blue-800 mb-6 transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Case List
+          </button>
+
+          {/* Case Details */}
+          <div className="card p-8">
+            <div className="mb-6">
+              <div className="flex items-center mb-4">
+                <Scale className="h-6 w-6 text-blue-600 mr-3" />
+                <h1 className="text-3xl font-bold text-gray-900">
+                  {selectedCase.caseTitle}
+                </h1>
+              </div>
+              
+              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-4">
+                <div className="flex items-center">
+                  <Building2 className="h-4 w-4 mr-1" />
+                  {selectedCase.court}
+                </div>
+                <div className="flex items-center">
+                  <Calendar className="h-4 w-4 mr-1" />
+                  {selectedCase.year}
+                </div>
+                <div className="font-medium">
+                  {selectedCase.citation}
+                </div>
+              </div>
+
+              <span className="inline-block px-3 py-1 bg-blue-100 text-blue-700 text-sm rounded-full">
+                {selectedCase.category}
+              </span>
+            </div>
+
+            {/* Case Summary */}
+            <div className="mb-8">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">Case Summary</h2>
+              <div className="prose prose-gray max-w-none">
+                <p className="text-gray-700 leading-relaxed text-lg">
+                  {selectedCase.summary}
+                </p>
+              </div>
+            </div>
+
+            {/* Key Points */}
+            <div>
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">Key Legal Points</h2>
+              <div className="grid gap-3">
+                {selectedCase.keyPoints.map((point: string, index: number) => (
+                  <div key={index} className="flex items-start">
+                    <div className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-medium mr-3 mt-0.5">
+                      {index + 1}
+                    </div>
+                    <p className="text-gray-700 leading-relaxed">{point}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Legal Significance */}
+            <div className="mt-8 p-6 bg-blue-50 rounded-lg border border-blue-200">
+              <h3 className="font-semibold text-blue-900 mb-2">Legal Significance</h3>
+              <p className="text-sm text-blue-700">
+                This landmark judgment by the {selectedCase.court} in {selectedCase.year} 
+                continues to serve as an important precedent in {selectedCase.category.toLowerCase()} 
+                matters across Indian courts. The case citation {selectedCase.citation} is 
+                frequently referenced in similar legal proceedings.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
@@ -107,12 +192,16 @@ export default function CaseLawPage() {
             ) : (
               <div className="space-y-6">
                 {cases?.map((caseItem: any) => (
-                  <div key={caseItem.id} className="card p-6">
+                  <button
+                    key={caseItem.id}
+                    onClick={() => setSelectedCase(caseItem)}
+                    className="card p-6 w-full text-left hover:shadow-lg hover:border-blue-200 transition-all duration-200 cursor-pointer group"
+                  >
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex-1">
                         <div className="flex items-center mb-2">
                           <Scale className="h-5 w-5 text-blue-600 mr-2" />
-                          <h3 className="font-semibold text-xl text-gray-900">
+                          <h3 className="font-semibold text-xl text-gray-900 group-hover:text-blue-700 transition-colors">
                             {caseItem.caseTitle}
                           </h3>
                         </div>
@@ -127,20 +216,30 @@ export default function CaseLawPage() {
                           {caseItem.category}
                         </span>
                       </div>
-                      <BookOpen className="h-6 w-6 text-gray-400 flex-shrink-0" />
+                      <div className="flex flex-col items-center">
+                        <BookOpen className="h-6 w-6 text-gray-400 group-hover:text-blue-600 transition-colors flex-shrink-0" />
+                        <span className="text-xs text-gray-500 mt-1 group-hover:text-blue-600 transition-colors">
+                          Read Full Case
+                        </span>
+                      </div>
                     </div>
                     
-                    <p className="text-gray-700 mb-4">{caseItem.summary}</p>
+                    <p className="text-gray-700 mb-4 line-clamp-3">{caseItem.summary}</p>
                     
                     <div>
                       <h4 className="font-medium text-gray-900 mb-2">Key Points:</h4>
                       <ul className="list-disc list-inside space-y-1 text-sm text-gray-600">
-                        {caseItem.keyPoints.map((point: string, index: number) => (
+                        {caseItem.keyPoints.slice(0, 2).map((point: string, index: number) => (
                           <li key={index}>{point}</li>
                         ))}
+                        {caseItem.keyPoints.length > 2 && (
+                          <li className="text-blue-600 font-medium">
+                            +{caseItem.keyPoints.length - 2} more key points...
+                          </li>
+                        )}
                       </ul>
                     </div>
-                  </div>
+                  </button>
                 ))}
               </div>
             )}
