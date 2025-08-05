@@ -12,7 +12,12 @@ const categories = [
   'Family Law',
   'Contracts',
   'Financial',
-  'Legal Notices'
+  'Legal Notices',
+  'Criminal Law',
+  'Technology',
+  'Civil Procedure',
+  'Intellectual Property',
+  'Dispute Resolution'
 ];
 
 export default function LegalTemplatesPage() {
@@ -20,16 +25,16 @@ export default function LegalTemplatesPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTemplate, setSelectedTemplate] = useState<any>(null);
 
-  const { data: templates, isLoading } = useQuery({
+  const { data: templates = [], isLoading } = useQuery({
     queryKey: selectedCategory === 'All Categories' 
       ? ['/api/templates'] 
       : ['/api/templates', { category: selectedCategory }],
   });
 
-  const filteredTemplates = templates?.filter((template: any) =>
+  const filteredTemplates = templates.filter((template: any) =>
     template.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     template.description.toLowerCase().includes(searchQuery.toLowerCase())
-  ) || [];
+  );
 
   const handleDownload = (template: any) => {
     const blob = new Blob([template.content], { type: 'text/plain' });

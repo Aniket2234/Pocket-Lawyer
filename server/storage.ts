@@ -856,6 +856,134 @@ WITNESSES:
 1. [NAME, ADDRESS & SIGNATURE]
 2. [NAME, ADDRESS & SIGNATURE]`,
         tags: ["will", "testament", "succession act", "executor", "beneficiary"],
+      },
+
+      // Additional Templates (11-22) to reach 20+
+      {
+        title: "Cheque Bounce Complaint under Section 138 NI Act",
+        category: "Criminal Law",
+        description: "Complaint format for dishonored cheque under Negotiable Instruments Act",
+        content: `COMPLAINT UNDER SECTION 138 NEGOTIABLE INSTRUMENTS ACT
+
+[Complainant Name] vs [Accused Name]
+
+FACTS: Accused issued cheque no. [NUMBER] for Rs. [AMOUNT] which was dishonored. Legal notice served but payment not made within 15 days.
+
+PRAYER: Convict accused and direct payment with interest.`,
+        tags: ["cheque bounce", "section 138", "legal notice"],
+      },
+      {
+        title: "Defamation Legal Notice",
+        category: "Legal Notices", 
+        description: "Notice for defamation demanding apology and damages",
+        content: `LEGAL NOTICE FOR DEFAMATION
+
+To: [Defendant]
+You published defamatory content on [date] causing reputation damage. 
+DEMAND: Immediate apology and Rs. [amount] damages within 15 days.`,
+        tags: ["defamation", "legal notice", "damages"],
+      },
+      {
+        title: "Property Partition Suit",
+        category: "Property",
+        description: "Suit for partition of joint family property", 
+        content: `PARTITION SUIT
+
+Plaintiff seeks partition of joint property [description] claiming [share] as legal heir.
+RELIEF: Preliminary and final decree for partition with separate possession.`,
+        tags: ["partition", "joint property", "inheritance"],
+      },
+      {
+        title: "Recovery Suit for Money",
+        category: "Financial",
+        description: "Civil suit for debt recovery",
+        content: `MONEY RECOVERY SUIT
+
+Defendant owes Rs. [amount] as loan given on [date]. Despite demands, payment not made.
+PRAYER: Decree for recovery with interest and costs.`,
+        tags: ["debt recovery", "loan", "civil suit"],
+      },
+      {
+        title: "Injunction Application", 
+        category: "Civil Procedure",
+        description: "Application for temporary/permanent injunction",
+        content: `INJUNCTION APPLICATION
+
+Respondent threatening [action] causing irreparable injury to applicant's rights.
+RELIEF: Temporary injunction restraining respondent from [specific acts].`,
+        tags: ["injunction", "restraining order", "civil procedure"],
+      },
+      {
+        title: "Vehicle Sale Agreement",
+        category: "Contracts",
+        description: "Motor vehicle sale with RC transfer",
+        content: `VEHICLE SALE AGREEMENT
+
+Vehicle: [Make/Model] Registration: [Number]
+Sale Price: Rs. [amount]
+Seller warrants clear title. RC transfer within 30 days.`,
+        tags: ["vehicle sale", "RC transfer", "motor vehicle"],
+      },
+      {
+        title: "Software Development Contract",
+        category: "Technology", 
+        description: "Custom software development agreement",
+        content: `SOFTWARE DEVELOPMENT AGREEMENT
+
+Project: [Name] Timeline: [Duration] Cost: Rs. [amount]
+Developer to deliver [specifications] with [warranty period] support.`,
+        tags: ["software", "development", "IT contract"],
+      },
+      {
+        title: "Franchise Agreement",
+        category: "Business",
+        description: "Business franchise licensing agreement", 
+        content: `FRANCHISE AGREEMENT
+
+Franchisor grants [territory] franchise for [business] with [fee structure].
+Franchisee to maintain brand standards and pay royalty.`,
+        tags: ["franchise", "licensing", "business"],
+      },
+      {
+        title: "Copyright Infringement Notice",
+        category: "Intellectual Property",
+        description: "Notice for copyright violation",
+        content: `COPYRIGHT INFRINGEMENT NOTICE
+
+Your unauthorized use of copyrighted work [description] violates Copyright Act.
+DEMAND: Cease infringement and pay damages Rs. [amount].`,
+        tags: ["copyright", "intellectual property", "infringement"],
+      },
+      {
+        title: "Company MOA and AOA",
+        category: "Business",
+        description: "Memorandum and Articles for company incorporation",
+        content: `MEMORANDUM OF ASSOCIATION
+
+Company: [Name] Private Limited
+Objects: [Business activities]
+Capital: Rs. [amount] divided into [shares] equity shares.`,
+        tags: ["company incorporation", "MOA", "AOA"],
+      },
+      {
+        title: "Property Development JV Agreement", 
+        category: "Property",
+        description: "Joint venture for real estate development",
+        content: `DEVELOPMENT AGREEMENT
+
+Landowner and Developer agree to develop [property] with [sharing ratio].
+Construction timeline: [period] Handover: [date]`,
+        tags: ["property development", "joint venture", "construction"],
+      },
+      {
+        title: "Arbitration Agreement",
+        category: "Dispute Resolution",
+        description: "Agreement for dispute resolution through arbitration",
+        content: `ARBITRATION AGREEMENT
+
+Parties agree to resolve disputes through arbitration under Arbitration Act 2015.
+Arbitrator: [Name/Institution] Seat: [City]`,
+        tags: ["arbitration", "dispute resolution", "mediation"],
       }
     ];
 
@@ -1316,7 +1444,11 @@ WITNESSES:
 
     guides.forEach(guide => {
       const id = this.currentGuideId++;
-      this.stateLawGuides.set(id, { ...guide, id });
+      this.stateLawGuides.set(id, { 
+        ...guide, 
+        id, 
+        lastUpdated: typeof guide.lastUpdated === 'string' ? new Date(guide.lastUpdated) : guide.lastUpdated
+      });
     });
   }
 
