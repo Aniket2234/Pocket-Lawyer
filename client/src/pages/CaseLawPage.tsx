@@ -6,9 +6,9 @@ const categories = [
   'All Categories',
   'Arrest Rights',
   'Tenant Rights', 
-  'Cybercrime',
   'Women\'s Safety',
-  'Consumer Rights'
+  'Consumer Complaints',
+  'Constitutional Law'
 ];
 
 export default function CaseLawPage() {
@@ -28,8 +28,8 @@ export default function CaseLawPage() {
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Case Law Database</h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Search landmark legal cases and precedents. Understand how courts have interpreted 
-            laws relevant to your situation.
+            Browse 50 landmark Supreme Court cases organized across 5 legal categories. 
+            Each category contains 10 important cases with detailed analysis.
           </p>
         </div>
 
@@ -78,6 +78,16 @@ export default function CaseLawPage() {
 
           {/* Main Content */}
           <div className="lg:w-3/4">
+            {/* Category Summary */}
+            {selectedCategory !== 'All Categories' && !isLoading && (
+              <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <h2 className="font-semibold text-blue-900 mb-1">{selectedCategory}</h2>
+                <p className="text-sm text-blue-700">
+                  {cases?.length || 0} cases in this category
+                </p>
+              </div>
+            )}
+            
             {isLoading ? (
               <div className="text-center py-12">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
