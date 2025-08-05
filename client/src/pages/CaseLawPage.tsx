@@ -6,10 +6,9 @@ const categories = [
   'All Categories',
   'Arrest Rights',
   'Tenant Rights', 
+  'Cybercrime',
   'Women\'s Safety',
-  'Consumer Rights',
-  'Employment Law',
-  'Constitutional Law'
+  'Consumer Rights'
 ];
 
 export default function CaseLawPage() {
