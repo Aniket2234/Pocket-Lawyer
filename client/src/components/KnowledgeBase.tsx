@@ -48,7 +48,7 @@ export default function KnowledgeBase() {
       title: 'Legal Document Templates',
       description: 'Download professionally drafted legal templates for common situations.',
       icon: FileText,
-      count: '50+ Templates',
+      count: '20+ Templates',
     },
     {
       title: 'Case Law Database',
