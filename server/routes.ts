@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { sendFeedbackNotification } from "./emailService";
 import { 
   insertChatMessageSchema, 
   insertKnowledgeArticleSchema,
@@ -284,6 +285,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const validatedData = insertFeedbackSchema.parse(req.body);
       const feedback = await storage.createFeedback(validatedData);
+      
+      // Send email notification to app creator
+      try {
+        await sendFeedbackNotification(feedback);
+        console.log(`Feedback notification email sent for feedback #${feedback.id}`);
+      } catch (emailError) {
+        console.error("Failed to send feedback notification email:", emailError);
+        // Continue with response even if email fails
+      }
+      
       res.json(feedback);
     } catch (error) {
       if (error instanceof z.ZodError) {
