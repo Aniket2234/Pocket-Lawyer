@@ -79,12 +79,23 @@ export default function CaseLawPage() {
           {/* Main Content */}
           <div className="lg:w-3/4">
             {/* Category Summary */}
-            {selectedCategory !== 'All Categories' && !isLoading && (
+            {!isLoading && (
               <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <h2 className="font-semibold text-blue-900 mb-1">{selectedCategory}</h2>
-                <p className="text-sm text-blue-700">
-                  {cases?.length || 0} cases in this category
-                </p>
+                {selectedCategory === 'All Categories' ? (
+                  <>
+                    <h2 className="font-semibold text-blue-900 mb-1">All Categories</h2>
+                    <p className="text-sm text-blue-700">
+                      Showing all {cases?.length || 0} landmark Supreme Court cases across 5 categories
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <h2 className="font-semibold text-blue-900 mb-1">{selectedCategory}</h2>
+                    <p className="text-sm text-blue-700">
+                      Showing {cases?.length || 0} cases in this category (exactly 10 cases per category)
+                    </p>
+                  </>
+                )}
               </div>
             )}
             
