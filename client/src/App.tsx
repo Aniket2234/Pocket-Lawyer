@@ -3,6 +3,7 @@ import Header from './components/Header';
 import HomePage from './pages/HomePage';
 import ChatPage from './pages/ChatPage';
 import KnowledgePage from './pages/KnowledgePage';
+import ArticleDetailPage from './pages/ArticleDetailPage';
 import DocumentAnalysisPage from './pages/DocumentAnalysisPage';
 import LegalTemplatesPage from './pages/LegalTemplatesPage';
 import CaseLawPage from './pages/CaseLawPage';
@@ -31,6 +32,7 @@ function App() {
           <Route path="/" component={HomePage} />
           <Route path="/chat" component={ChatPage} />
           <Route path="/knowledge" component={KnowledgePage} />
+          <Route path="/knowledge/article/:id" component={ArticleDetailPage} />
           <Route path="/documents" component={DocumentAnalysisPage} />
           <Route path="/templates" component={LegalTemplatesPage} />
           <Route path="/cases" component={CaseLawPage} />

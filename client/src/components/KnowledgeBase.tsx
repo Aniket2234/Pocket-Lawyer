@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Search, Book, FileText, Scale, Building, Heart, Car, Home, Briefcase, Shield, User, ShoppingCart } from 'lucide-react';
+import { Link } from 'wouter';
+import { Search, Book, FileText, Scale, Building, Heart, Car, Home, Briefcase, Shield, User, ShoppingCart, Clock, ArrowRight } from 'lucide-react';
+import type { KnowledgeArticle } from '../../../shared/schema';
 
 export default function KnowledgeBase() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -11,19 +13,35 @@ export default function KnowledgeBase() {
     { id: 'Arrest Rights', name: 'Arrest Rights', icon: Shield, color: 'bg-red-500' },
     { id: 'Tenant Rights', name: 'Tenant Rights', icon: Home, color: 'bg-blue-500' },
     { id: 'Cybercrime', name: 'Cybercrime', icon: Shield, color: 'bg-purple-500' },
-    { id: 'Women\'s Safety', name: 'Women\'s Safety', icon: User, color: 'bg-pink-500' },
+    { id: "Women's Safety", name: "Women's Safety", icon: User, color: 'bg-pink-500' },
     { id: 'Consumer Complaints', name: 'Consumer Complaints', icon: ShoppingCart, color: 'bg-green-500' },
   ];
 
-  const { data: articles, isLoading } = useQuery({
+  const { data: articles = [], isLoading, error } = useQuery<KnowledgeArticle[]>({
     queryKey: ['/api/knowledge'],
+    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
   });
 
-  const filteredArticles = articles?.filter((article: any) =>
-    (selectedCategory === 'all' || article.category === selectedCategory) &&
-    (article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-     article.content.toLowerCase().includes(searchQuery.toLowerCase()))
-  ) || [];
+  // Real-time filtering with useMemo for performance
+  const filteredArticles = useMemo(() => {
+    if (!articles.length) return [];
+    
+    return articles.filter((article) => {
+      const matchesCategory = selectedCategory === 'all' || article.category === selectedCategory;
+      const matchesSearch = searchQuery === '' || 
+        article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        article.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (article.tags && article.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())));
+      
+      return matchesCategory && matchesSearch;
+    });
+  }, [articles, selectedCategory, searchQuery]);
+
+  // Get article count for each category
+  const getCategoryCount = (categoryId: string) => {
+    if (categoryId === 'all') return articles.length;
+    return articles.filter(article => article.category === categoryId).length;
+  };
 
   const featuredResources = [
     {
@@ -71,6 +89,7 @@ export default function KnowledgeBase() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-12 pr-4 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-lg"
+              data-testid="search-input"
             />
           </div>
         </div>
@@ -79,6 +98,7 @@ export default function KnowledgeBase() {
         <div className="flex flex-wrap justify-center gap-3 mb-12">
           {categories.map((category) => {
             const Icon = category.icon;
+            const count = getCategoryCount(category.id);
             return (
               <button
                 key={category.id}
@@ -88,9 +108,17 @@ export default function KnowledgeBase() {
                     ? `${category.color} text-white shadow-lg`
                     : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
                 }`}
+                data-testid={`category-${category.id}`}
               >
                 <Icon className="h-4 w-4" />
                 <span>{category.name}</span>
+                <span className={`ml-1 px-2 py-0.5 rounded-full text-xs ${
+                  selectedCategory === category.id
+                    ? 'bg-white/20 text-white'
+                    : 'bg-gray-100 text-gray-600'
+                }`}>
+                  {count}
+                </span>
               </button>
             );
           })}
@@ -113,66 +141,159 @@ export default function KnowledgeBase() {
           })}
         </div>
 
-        {/* Articles Grid */}
-        <div>
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">
-              {selectedCategory === 'all' ? 'All Articles' : categories.find(c => c.id === selectedCategory)?.name}
-            </h2>
-            <span className="text-gray-600">{filteredArticles.length} articles found</span>
-          </div>
-
+        {/* Loading State */}
+        {isLoading && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {filteredArticles.map((article: any) => (
-              <article key={article.id} className="card p-8 hover:scale-105 transition-all duration-300">
-                <div className="flex items-center space-x-4 mb-4">
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                    article.difficulty === 'Beginner' ? 'bg-green-100 text-green-800' :
-                    article.difficulty === 'Intermediate' ? 'bg-yellow-100 text-yellow-800' :
-                    'bg-red-100 text-red-800'
-                  }`}>
-                    {article.difficulty}
-                  </span>
-                  <span className="text-sm text-gray-500">{article.readTime}</span>
+            {[...Array(6)].map((_, index) => (
+              <div key={index} className="card p-8 animate-pulse">
+                <div className="h-6 bg-gray-300 rounded w-1/4 mb-4"></div>
+                <div className="h-8 bg-gray-300 rounded w-3/4 mb-4"></div>
+                <div className="h-4 bg-gray-300 rounded w-full mb-2"></div>
+                <div className="h-4 bg-gray-300 rounded w-5/6 mb-4"></div>
+                <div className="flex gap-2 mb-4">
+                  <div className="h-6 bg-gray-300 rounded w-16"></div>
+                  <div className="h-6 bg-gray-300 rounded w-20"></div>
                 </div>
-
-                <h3 className="text-xl font-semibold text-gray-900 mb-3 hover:text-blue-600 transition-colors cursor-pointer">
-                  {article.title}
-                </h3>
-
-                <p className="text-gray-600 mb-4 leading-relaxed">
-                  {article.excerpt}
-                </p>
-
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {article.tags?.map((tag: string, index: number) => (
-                    <span
-                      key={index}
-                      className="px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded-md font-medium"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-
-                <button className="text-blue-600 hover:text-blue-700 font-medium text-sm flex items-center group">
-                  Read Article
-                  <svg className="ml-1 h-4 w-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-              </article>
+                <div className="h-4 bg-gray-300 rounded w-24"></div>
+              </div>
             ))}
           </div>
+        )}
 
-          {filteredArticles.length === 0 && (
-            <div className="text-center py-12">
-              <Book className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No articles found</h3>
-              <p className="text-gray-600">Try adjusting your search or category filter.</p>
+        {/* Error State */}
+        {error && (
+          <div className="text-center py-12">
+            <div className="text-red-500 mb-4">
+              <Book className="h-16 w-16 mx-auto mb-4" />
             </div>
-          )}
-        </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Failed to load articles</h3>
+            <p className="text-gray-600">Please try refreshing the page.</p>
+          </div>
+        )}
+
+        {/* Articles Grid */}
+        {!isLoading && !error && (
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">
+                {selectedCategory === 'all' ? 'All Articles' : categories.find(c => c.id === selectedCategory)?.name}
+              </h2>
+              <div className="flex items-center gap-4">
+                <span className="text-gray-600" data-testid="articles-count">
+                  {filteredArticles.length} article{filteredArticles.length !== 1 ? 's' : ''} found
+                </span>
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="text-sm text-blue-600 hover:text-blue-700"
+                    data-testid="clear-search"
+                  >
+                    Clear search
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {filteredArticles.map((article) => (
+                <article 
+                  key={article.id} 
+                  className="card p-8 hover:scale-105 transition-all duration-300 group cursor-pointer"
+                  data-testid={`article-${article.id}`}
+                >
+                  <div className="flex items-center space-x-4 mb-4">
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                      article.category === 'Arrest Rights' ? 'bg-red-100 text-red-800' :
+                      article.category === 'Tenant Rights' ? 'bg-blue-100 text-blue-800' :
+                      article.category === 'Cybercrime' ? 'bg-purple-100 text-purple-800' :
+                      article.category === "Women's Safety" ? 'bg-pink-100 text-pink-800' :
+                      article.category === 'Consumer Complaints' ? 'bg-green-100 text-green-800' :
+                      'bg-gray-100 text-gray-800'
+                    }`}>
+                      {article.category}
+                    </span>
+                    <div className="flex items-center text-sm text-gray-500">
+                      <Clock className="h-4 w-4 mr-1" />
+                      <span>5 min read</span>
+                    </div>
+                  </div>
+
+                  <Link href={`/knowledge/article/${article.id}`}>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors">
+                      {article.title}
+                    </h3>
+                  </Link>
+
+                  <p className="text-gray-600 mb-4 leading-relaxed line-clamp-3">
+                    {article.content.substring(0, 200)}...
+                  </p>
+
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {article.tags?.slice(0, 3).map((tag: string, index: number) => (
+                      <span
+                        key={index}
+                        className="px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded-md font-medium hover:bg-blue-100 cursor-pointer transition-colors"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setSearchQuery(tag);
+                        }}
+                        data-testid={`tag-${tag}`}
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                    {article.tags && article.tags.length > 3 && (
+                      <span className="px-2 py-1 bg-gray-50 text-gray-500 text-xs rounded-md font-medium">
+                        +{article.tags.length - 3} more
+                      </span>
+                    )}
+                  </div>
+
+                  <Link 
+                    href={`/knowledge/article/${article.id}`}
+                    className="text-blue-600 hover:text-blue-700 font-medium text-sm flex items-center group"
+                    data-testid={`read-article-${article.id}`}
+                  >
+                    Read Article
+                    <ArrowRight className="ml-1 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  </Link>
+                </article>
+              ))}
+            </div>
+
+            {/* No Results State */}
+            {filteredArticles.length === 0 && (
+              <div className="text-center py-12" data-testid="no-articles">
+                <Book className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">No articles found</h3>
+                <p className="text-gray-600 mb-4">
+                  {searchQuery 
+                    ? `No articles match "${searchQuery}" in the ${selectedCategory === 'all' ? 'selected categories' : selectedCategory} category.`
+                    : `No articles available in the ${selectedCategory} category.`
+                  }
+                </p>
+                <div className="space-x-4">
+                  {searchQuery && (
+                    <button
+                      onClick={() => setSearchQuery('')}
+                      className="text-blue-600 hover:text-blue-700 font-medium"
+                    >
+                      Clear search
+                    </button>
+                  )}
+                  {selectedCategory !== 'all' && (
+                    <button
+                      onClick={() => setSelectedCategory('all')}
+                      className="text-blue-600 hover:text-blue-700 font-medium"
+                    >
+                      View all categories
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

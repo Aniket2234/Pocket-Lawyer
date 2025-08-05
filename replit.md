@@ -51,13 +51,18 @@ A comprehensive AI-powered legal assistant platform that provides instant legal 
 - No sensitive data exposure in frontend
 - Error handling and validation at all levels
 
-## Recent Changes (Migration from Bolt)
+## Recent Changes (Migration from Replit Agent)
 - **Date**: August 5, 2025
 - **Migrated**: Project structure to follow Replit fullstack patterns
 - **Updated**: Routing from manual state management to Wouter
 - **Added**: Type-safe API layer with proper validation
 - **Implemented**: Comprehensive data schema for all features
 - **Enhanced**: Error handling and server-side validation
+- **Implemented**: Real-time knowledge base with category filtering
+- **Added**: Article detail pages with proper navigation
+- **Enhanced**: Search functionality with tag-based filtering
+- **Added**: Interactive category buttons with article counts
+- **Implemented**: Clickable tags for quick search filtering
 
 ## Development Guidelines
 - Follow Replit's fullstack_js development patterns
