@@ -18,7 +18,9 @@ const categories = [
   'Technology',
   'Civil Procedure',
   'Intellectual Property',
-  'Dispute Resolution'
+  'Dispute Resolution',
+  'Property',
+  'Consumer Protection'
 ];
 
 export default function LegalTemplatesPage() {
@@ -29,7 +31,15 @@ export default function LegalTemplatesPage() {
   const { data: templates = [], isLoading } = useQuery<LegalTemplate[]>({
     queryKey: selectedCategory === 'All Categories' 
       ? ['/api/templates'] 
-      : ['/api/templates', { category: selectedCategory }],
+      : ['/api/templates', selectedCategory],
+    queryFn: async () => {
+      const url = selectedCategory === 'All Categories' 
+        ? '/api/templates'
+        : `/api/templates?category=${encodeURIComponent(selectedCategory)}`;
+      const response = await fetch(url);
+      if (!response.ok) throw new Error('Failed to fetch templates');
+      return response.json();
+    }
   });
 
   const filteredTemplates = templates.filter((template: LegalTemplate) =>
