@@ -190,17 +190,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const category = req.query.category as string;
       const search = req.query.search as string;
       
+      console.log("Cases API called with:", { category, search, query: req.query });
+      
       let cases;
       if (search) {
+        console.log("Searching cases with query:", search);
         cases = await storage.searchCaseLaw(search);
       } else if (category) {
+        console.log("Filtering cases by category:", category);
         cases = await storage.getCaseLawByCategory(category);
       } else {
+        console.log("Getting all cases");
         cases = await storage.getCaseLaw();
       }
       
+      console.log("Returning", cases.length, "cases");
       res.json(cases);
     } catch (error) {
+      console.error("Error fetching cases:", error);
       res.status(500).json({ message: "Failed to fetch case law" });
     }
   });

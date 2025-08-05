@@ -36,8 +36,24 @@ export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       queryFn: async ({ queryKey }) => {
-        const [url] = queryKey as [string];
-        return apiRequest(url);
+        const [url, params] = queryKey as [string, Record<string, any>?];
+        
+        // Build URL with query parameters
+        let finalUrl = url;
+        if (params && Object.keys(params).length > 0) {
+          const searchParams = new URLSearchParams();
+          Object.entries(params).forEach(([key, value]) => {
+            if (value !== undefined && value !== null) {
+              searchParams.append(key, String(value));
+            }
+          });
+          const queryString = searchParams.toString();
+          if (queryString) {
+            finalUrl = `${url}?${queryString}`;
+          }
+        }
+        
+        return apiRequest(finalUrl);
       },
       staleTime: 5 * 60 * 1000, // 5 minutes
       retry: 1,
