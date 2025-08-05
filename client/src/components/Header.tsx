@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'wouter';
-import { Scale, MessageCircle, Book, FileText, Menu, X } from 'lucide-react';
+import { Scale, MessageCircle, Book, FileText, Menu, X, ThumbsUp, ThumbsDown, MessageSquare } from 'lucide-react';
+import FeedbackWidget from './FeedbackWidget';
 
 interface HeaderProps {
   activeSection: string;
@@ -32,25 +33,30 @@ export default function Header({ activeSection }: HeaderProps) {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-1">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              return (
-                <Link
-                  key={item.id}
-                  href={item.path}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-                    activeSection === item.id
-                      ? 'bg-blue-600 text-white shadow-lg'
-                      : 'text-gray-700 hover:bg-white/50 hover:text-blue-600'
-                  }`}
-                >
-                  <Icon className="h-4 w-4" />
-                  <span>{item.label}</span>
-                </Link>
-              );
-            })}
-          </nav>
+          <div className="hidden md:flex items-center space-x-4">
+            <nav className="flex items-center space-x-1">
+              {navItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.id}
+                    href={item.path}
+                    className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                      activeSection === item.id
+                        ? 'bg-blue-600 text-white shadow-lg'
+                        : 'text-gray-700 hover:bg-white/50 hover:text-blue-600'
+                    }`}
+                  >
+                    <Icon className="h-4 w-4" />
+                    <span>{item.label}</span>
+                  </Link>
+                );
+              })}
+            </nav>
+            
+            {/* Feedback Widget */}
+            <FeedbackWidget />
+          </div>
 
           {/* Mobile Menu Button */}
           <button
@@ -83,6 +89,11 @@ export default function Header({ activeSection }: HeaderProps) {
                   </Link>
                 );
               })}
+              
+              {/* Mobile Feedback Widget */}
+              <div className="px-4 py-2">
+                <FeedbackWidget />
+              </div>
             </nav>
           </div>
         )}

@@ -69,6 +69,15 @@ export const stateLawGuides = pgTable("state_law_guides", {
   lastUpdated: timestamp("last_updated").defaultNow().notNull(),
 });
 
+// User feedback
+export const feedback = pgTable("feedback", {
+  id: serial("id").primaryKey(),
+  type: text("type", { enum: ["positive", "negative", "text"] }).notNull(),
+  content: text("content"), // For text feedback
+  timestamp: timestamp("timestamp").defaultNow().notNull(),
+  userAgent: text("user_agent"), // Optional browser info
+});
+
 // Schema definitions
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
@@ -102,6 +111,11 @@ export const insertStateLawGuideSchema = createInsertSchema(stateLawGuides).omit
   lastUpdated: true,
 });
 
+export const insertFeedbackSchema = createInsertSchema(feedback).omit({
+  id: true,
+  timestamp: true,
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -123,3 +137,6 @@ export type InsertCaseLaw = z.infer<typeof insertCaseLawSchema>;
 
 export type StateLawGuide = typeof stateLawGuides.$inferSelect;
 export type InsertStateLawGuide = z.infer<typeof insertStateLawGuideSchema>;
+
+export type Feedback = typeof feedback.$inferSelect;
+export type InsertFeedback = z.infer<typeof insertFeedbackSchema>;

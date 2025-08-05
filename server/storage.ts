@@ -6,6 +6,7 @@ import {
   legalTemplates,
   caseLaw,
   stateLawGuides,
+  feedback,
   type User, 
   type InsertUser,
   type ChatMessage,
@@ -19,7 +20,9 @@ import {
   type CaseLaw,
   type InsertCaseLaw,
   type StateLawGuide,
-  type InsertStateLawGuide
+  type InsertStateLawGuide,
+  type Feedback,
+  type InsertFeedback
 } from "@shared/schema";
 
 export interface IStorage {
@@ -57,6 +60,10 @@ export interface IStorage {
   getStateLawGuides(): Promise<StateLawGuide[]>;
   getStateLawGuidesByState(state: string): Promise<StateLawGuide[]>;
   getStateLawGuidesByCategory(category: string): Promise<StateLawGuide[]>;
+  
+  // Feedback methods
+  createFeedback(feedback: InsertFeedback): Promise<Feedback>;
+  getFeedback(): Promise<Feedback[]>;
 }
 
 export class MemStorage implements IStorage {
@@ -67,6 +74,7 @@ export class MemStorage implements IStorage {
   private legalTemplates: Map<number, LegalTemplate>;
   private caseLaws: Map<number, CaseLaw>;
   private stateLawGuides: Map<number, StateLawGuide>;
+  private feedbackList: Map<number, Feedback>;
   private currentUserId: number;
   private currentChatMessageId: number;
   private currentKnowledgeId: number;
@@ -74,6 +82,7 @@ export class MemStorage implements IStorage {
   private currentTemplateId: number;
   private currentCaseLawId: number;
   private currentGuideId: number;
+  private currentFeedbackId: number;
 
   constructor() {
     this.users = new Map();
@@ -83,6 +92,7 @@ export class MemStorage implements IStorage {
     this.legalTemplates = new Map();
     this.caseLaws = new Map();
     this.stateLawGuides = new Map();
+    this.feedbackList = new Map();
     this.currentUserId = 1;
     this.currentChatMessageId = 1;
     this.currentKnowledgeId = 1;
@@ -90,6 +100,7 @@ export class MemStorage implements IStorage {
     this.currentTemplateId = 1;
     this.currentCaseLawId = 1;
     this.currentGuideId = 1;
+    this.currentFeedbackId = 1;
     
     // Initialize with sample data
     this.initializeKnowledgeBase();
@@ -1277,6 +1288,22 @@ Arbitrator: [Name/Institution] Seat: [City]`,
       const id = this.currentGuideId++;
       this.stateLawGuides.set(id, { ...guide, id });
     });
+  }
+
+  // Feedback methods
+  async createFeedback(feedbackData: InsertFeedback): Promise<Feedback> {
+    const id = this.currentFeedbackId++;
+    const feedback: Feedback = {
+      id,
+      ...feedbackData,
+      timestamp: new Date(),
+    };
+    this.feedbackList.set(id, feedback);
+    return feedback;
+  }
+
+  async getFeedback(): Promise<Feedback[]> {
+    return Array.from(this.feedbackList.values());
   }
 }
 

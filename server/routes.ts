@@ -7,7 +7,8 @@ import {
   insertDocumentAnalysisSchema,
   insertLegalTemplateSchema,
   insertCaseLawSchema,
-  insertStateLawGuideSchema
+  insertStateLawGuideSchema,
+  insertFeedbackSchema
 } from "@shared/schema";
 import { z } from "zod";
 
@@ -275,6 +276,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ response });
     } catch (error) {
       res.status(500).json({ message: "Failed to process AI response" });
+    }
+  });
+
+  // Feedback API routes
+  app.post("/api/feedback", async (req, res) => {
+    try {
+      const validatedData = insertFeedbackSchema.parse(req.body);
+      const feedback = await storage.createFeedback(validatedData);
+      res.json(feedback);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ message: "Invalid feedback data", errors: error.errors });
+      } else {
+        res.status(500).json({ message: "Failed to create feedback" });
+      }
+    }
+  });
+
+  app.get("/api/feedback", async (req, res) => {
+    try {
+      const feedback = await storage.getFeedback();
+      res.json(feedback);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch feedback" });
     }
   });
 
