@@ -1,8 +1,9 @@
 import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'wouter';
-import { Search, Book, FileText, Scale, Building, Heart, Car, Home, Briefcase, Shield, User, ShoppingCart, Clock, ArrowRight } from 'lucide-react';
+import { Search, Book, FileText, Scale, Building, Heart, Car, Home, Briefcase, Shield, User, ShoppingCart, Clock, ArrowRight, Gavel } from 'lucide-react';
 import type { KnowledgeArticle } from '../../../shared/schema';
+import LegalBackground from './LegalBackground';
 
 export default function KnowledgeBase() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -67,20 +68,33 @@ export default function KnowledgeBase() {
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="relative min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-8 overflow-hidden">
+      {/* Animated Legal Background */}
+      <LegalBackground variant="page" className="opacity-20" />
+      
+      {/* Floating Legal Icons */}
+      <div className="absolute top-20 left-10 animate-float opacity-10">
+        <Scale className="h-16 w-16 text-blue-600" />
+      </div>
+      <div className="absolute bottom-20 right-10 animate-float animation-delay-300 opacity-10">
+        <Gavel className="h-14 w-14 text-emerald-600" />
+      </div>
+      
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-            Legal Knowledge Base
-          </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Comprehensive legal resources, guides, and templates to help you understand your rights and navigate legal matters.
-          </p>
+          <div className="animate-fade-in-up">
+            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+              Legal Knowledge Base
+            </h1>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto animate-slide-in-left animation-delay-75">
+              Comprehensive legal resources, guides, and templates to help you understand your rights and navigate legal matters.
+            </p>
+          </div>
         </div>
 
         {/* Search Bar */}
-        <div className="max-w-2xl mx-auto mb-8">
+        <div className="max-w-2xl mx-auto mb-8 animate-fade-in-up animation-delay-150">
           <div className="relative">
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
             <input
@@ -88,29 +102,30 @@ export default function KnowledgeBase() {
               placeholder="Search legal topics, guides, and resources..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-lg"
+              className="w-full pl-12 pr-4 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-lg glass-effect"
               data-testid="search-input"
             />
           </div>
         </div>
 
         {/* Categories */}
-        <div className="flex flex-wrap justify-center gap-3 mb-12">
-          {categories.map((category) => {
+        <div className="flex flex-wrap justify-center gap-3 mb-12 animate-slide-in-right animation-delay-300">
+          {categories.map((category, index) => {
             const Icon = category.icon;
             const count = getCategoryCount(category.id);
             return (
               <button
                 key={category.id}
                 onClick={() => setSelectedCategory(category.id)}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-full font-medium transition-all duration-200 ${
+                className={`flex items-center space-x-2 px-4 py-2 rounded-full font-medium transition-all duration-200 hover:scale-105 hover:-translate-y-1 animate-fade-in-up ${
                   selectedCategory === category.id
-                    ? `${category.color} text-white shadow-lg`
-                    : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+                    ? `${category.color} text-white shadow-lg animate-bounce-subtle`
+                    : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200 glass-effect'
                 }`}
+                style={{ animationDelay: `${index * 100 + 400}ms` }}
                 data-testid={`category-${category.id}`}
               >
-                <Icon className="h-4 w-4" />
+                <Icon className="h-4 w-4 animate-pulse-subtle" />
                 <span>{category.name}</span>
                 <span className={`ml-1 px-2 py-0.5 rounded-full text-xs ${
                   selectedCategory === category.id
@@ -139,16 +154,17 @@ export default function KnowledgeBase() {
               <Link
                 key={index}
                 href={getResourceLink()}
-                className="card p-6 text-center hover:scale-105 transition-all duration-300 cursor-pointer block"
+                className="card p-6 text-center hover:scale-105 transition-all duration-300 cursor-pointer block animate-fade-in-up glass-effect"
+                style={{ animationDelay: `${index * 150 + 600}ms` }}
               >
-                <div className="inline-flex p-4 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-xl mb-4">
+                <div className="inline-flex p-4 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-xl mb-4 animate-bounce-subtle">
                   <Icon className="h-8 w-8 text-white" />
                 </div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">{resource.title}</h3>
                 <p className="text-gray-600 mb-4">{resource.description}</p>
-                <div className="text-sm font-medium text-blue-600 flex items-center justify-center gap-1">
+                <div className="text-sm font-medium text-blue-600 flex items-center justify-center gap-1 animate-pulse-subtle">
                   {resource.count}
-                  <ArrowRight className="h-4 w-4" />
+                  <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </div>
               </Link>
             );
@@ -209,14 +225,15 @@ export default function KnowledgeBase() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {filteredArticles.map((article) => (
+              {filteredArticles.map((article, index) => (
                 <article 
                   key={article.id} 
-                  className="card p-8 hover:scale-105 transition-all duration-300 group cursor-pointer"
+                  className="card p-8 hover:scale-105 transition-all duration-300 group cursor-pointer animate-fade-in-up glass-effect"
+                  style={{ animationDelay: `${index * 100 + 1000}ms` }}
                   data-testid={`article-${article.id}`}
                 >
                   <div className="flex items-center space-x-4 mb-4">
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium animate-pulse-subtle ${
                       article.category === 'Arrest Rights' ? 'bg-red-100 text-red-800' :
                       article.category === 'Tenant Rights' ? 'bg-blue-100 text-blue-800' :
                       article.category === 'Cybercrime' ? 'bg-purple-100 text-purple-800' :
@@ -227,13 +244,13 @@ export default function KnowledgeBase() {
                       {article.category}
                     </span>
                     <div className="flex items-center text-sm text-gray-500">
-                      <Clock className="h-4 w-4 mr-1" />
+                      <Clock className="h-4 w-4 mr-1 animate-bounce-subtle" />
                       <span>5 min read</span>
                     </div>
                   </div>
 
                   <Link href={`/knowledge/article/${article.id}`}>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors">
+                    <h3 className="text-xl font-semibold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors animate-slide-in-left">
                       {article.title}
                     </h3>
                   </Link>

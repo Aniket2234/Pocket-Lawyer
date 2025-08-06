@@ -1,5 +1,6 @@
 import React from 'react';
-import { MessageSquare, FileSearch, Users, Brain, Shield, Clock } from 'lucide-react';
+import { MessageSquare, FileSearch, Users, Brain, Shield, Clock, Scale, Gavel } from 'lucide-react';
+import LegalBackground from './LegalBackground';
 
 export default function Features() {
   const features = [
@@ -37,16 +38,29 @@ export default function Features() {
   ];
 
   return (
-    <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
-      <div className="max-w-7xl mx-auto">
+    <section className="relative py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 to-blue-50 overflow-hidden">
+      {/* Animated Background */}
+      <LegalBackground variant="subtle" className="opacity-30" />
+      
+      {/* Floating Legal Icons */}
+      <div className="absolute top-10 left-10 animate-float opacity-10">
+        <Scale className="h-20 w-20 text-blue-600" />
+      </div>
+      <div className="absolute bottom-10 right-10 animate-float animation-delay-300 opacity-10">
+        <Gavel className="h-18 w-18 text-emerald-600" />
+      </div>
+      
+      <div className="relative z-10 max-w-7xl mx-auto">
         <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-            Everything You Need for
-            <span className="gradient-text"> Legal Success</span>
-          </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Comprehensive legal assistance powered by cutting-edge AI technology and backed by professional expertise.
-          </p>
+          <div className="animate-fade-in-up">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+              Everything You Need for
+              <span className="gradient-text animate-scale-glow"> Legal Success</span>
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto animate-slide-in-left animation-delay-75">
+              Comprehensive legal assistance powered by cutting-edge AI technology and backed by professional expertise.
+            </p>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -55,9 +69,10 @@ export default function Features() {
             return (
               <div
                 key={index}
-                className="card p-8 group hover:scale-105 transition-all duration-300"
+                className={`card p-8 group hover:scale-105 transition-all duration-300 animate-fade-in-up animation-delay-${index * 75}`}
+                style={{ animationDelay: `${index * 150}ms` }}
               >
-                <div className={`inline-flex p-4 rounded-xl bg-gradient-to-r ${feature.color} mb-6 group-hover:scale-110 transition-transform duration-200`}>
+                <div className={`inline-flex p-4 rounded-xl bg-gradient-to-r ${feature.color} mb-6 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 animate-bounce-subtle`}>
                   <Icon className="h-8 w-8 text-white" />
                 </div>
                 

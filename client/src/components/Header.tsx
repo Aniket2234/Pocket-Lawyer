@@ -23,12 +23,12 @@ export default function Header({ activeSection }: HeaderProps) {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2 cursor-pointer group">
-            <div className="p-2 bg-gradient-to-br from-blue-600 to-emerald-600 rounded-lg group-hover:scale-110 transition-transform duration-200">
-              <Scale className="h-6 w-6 text-white" />
+            <div className="p-2 bg-gradient-to-br from-blue-600 to-emerald-600 rounded-lg group-hover:scale-110 transition-transform duration-200 animate-bounce-subtle">
+              <Scale className="h-6 w-6 text-white animate-pulse-subtle" />
             </div>
             <div>
-              <h1 className="text-xl font-bold gradient-text">Pocket Lawyer</h1>
-              <p className="text-xs text-gray-600 -mt-1">AI Legal Assistant</p>
+              <h1 className="text-xl font-bold gradient-text animate-scale-glow">Pocket Lawyer</h1>
+              <p className="text-xs text-gray-600 -mt-1 animate-fade-in-up animation-delay-150">AI Legal Assistant</p>
             </div>
           </Link>
 
@@ -41,13 +41,14 @@ export default function Header({ activeSection }: HeaderProps) {
                   <Link
                     key={item.id}
                     href={item.path}
-                    className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                    className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:scale-105 hover:-translate-y-0.5 animate-fade-in-up ${
                       activeSection === item.id
-                        ? 'bg-blue-600 text-white shadow-lg'
+                        ? 'bg-blue-600 text-white shadow-lg animate-bounce-subtle'
                         : 'text-gray-700 hover:bg-white/50 hover:text-blue-600'
                     }`}
+                    style={{ animationDelay: `${navItems.indexOf(item) * 100}ms` }}
                   >
-                    <Icon className="h-4 w-4" />
+                    <Icon className="h-4 w-4 animate-pulse-subtle" />
                     <span>{item.label}</span>
                   </Link>
                 );

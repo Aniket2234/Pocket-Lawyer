@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { MessageCircle, Shield, Zap, Users, Play, X } from 'lucide-react';
+import { MessageCircle, Shield, Zap, Users, Play, X, Scale, Gavel } from 'lucide-react';
+import LegalBackground from './LegalBackground';
 
 interface HeroProps {
   onGetStarted: () => void;
@@ -169,22 +170,44 @@ function DemoConversation({ onClose }: { onClose: () => void }) {
 export default function Hero({ onGetStarted }: HeroProps) {
   return (
     <section className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 overflow-hidden">
-      {/* Background Elements */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-emerald-50"></div>
-      <div className="absolute top-20 left-10 w-72 h-72 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse-subtle"></div>
-      <div className="absolute top-40 right-10 w-72 h-72 bg-emerald-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse-subtle animation-delay-75"></div>
-      <div className="absolute -bottom-8 left-20 w-72 h-72 bg-orange-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse-subtle animation-delay-150"></div>
+      {/* Animated Legal Background */}
+      <LegalBackground variant="hero" />
+      
+      {/* Additional Background Elements */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/80 via-white/60 to-emerald-50/80"></div>
+      <div className="absolute top-20 left-10 w-72 h-72 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse-subtle"></div>
+      <div className="absolute top-40 right-10 w-72 h-72 bg-emerald-200 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse-subtle animation-delay-75"></div>
+      <div className="absolute -bottom-8 left-20 w-72 h-72 bg-orange-200 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse-subtle animation-delay-150"></div>
+      
+      {/* Floating Legal Elements */}
+      <div className="absolute top-1/4 left-8 animate-float opacity-20">
+        <Scale className="h-16 w-16 text-blue-600" />
+      </div>
+      <div className="absolute top-3/4 right-12 animate-float animation-delay-300 opacity-20">
+        <Gavel className="h-14 w-14 text-emerald-600" />
+      </div>
 
       <div className="relative z-10 max-w-7xl mx-auto">
         <div className="text-center">
           {/* Main Heading */}
           <div className="animate-fade-in-up">
-            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-gray-900 mb-6">
+            <div className="flex items-center justify-center mb-4">
+              <div className="animate-bounce-subtle mr-4">
+                <Scale className="h-12 w-12 text-blue-600" />
+              </div>
+              <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-gray-900">
+                Pocket Lawyer
+              </h1>
+              <div className="animate-bounce-subtle ml-4 animation-delay-150">
+                <Gavel className="h-12 w-12 text-emerald-600" />
+              </div>
+            </div>
+            <h2 className="text-2xl sm:text-3xl lg:text-5xl font-semibold mb-6">
               Your AI-Powered
-              <span className="block gradient-text">Legal Assistant</span>
-            </h1>
+              <span className="block gradient-text animate-scale-glow">Legal Assistant</span>
+            </h2>
             
-            <p className="text-xl sm:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto text-balance">
+            <p className="text-xl sm:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto text-balance animate-slide-in-left animation-delay-75">
               Get instant legal guidance, analyze documents, and connect with professional lawyers. 
               All in one intelligent platform.
             </p>
