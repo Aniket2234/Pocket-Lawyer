@@ -93,52 +93,6 @@ export default function KnowledgeBase() {
           </div>
         </div>
 
-        {/* Search Bar */}
-        <div className="max-w-2xl mx-auto mb-8 animate-fade-in-up animation-delay-150">
-          <div className="relative">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search legal topics, guides, and resources..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-lg glass-effect"
-              data-testid="search-input"
-            />
-          </div>
-        </div>
-
-        {/* Categories */}
-        <div className="flex flex-wrap justify-center gap-3 mb-12 animate-slide-in-right animation-delay-300">
-          {categories.map((category, index) => {
-            const Icon = category.icon;
-            const count = getCategoryCount(category.id);
-            return (
-              <button
-                key={category.id}
-                onClick={() => setSelectedCategory(category.id)}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-full font-medium transition-all duration-200 hover:scale-105 hover:-translate-y-1 animate-fade-in-up ${
-                  selectedCategory === category.id
-                    ? `${category.color} text-white shadow-lg animate-bounce-subtle`
-                    : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200 glass-effect'
-                }`}
-                style={{ animationDelay: `${index * 100 + 400}ms` }}
-                data-testid={`category-${category.id}`}
-              >
-                <Icon className="h-4 w-4 animate-pulse-subtle" />
-                <span>{category.name}</span>
-                <span className={`ml-1 px-2 py-0.5 rounded-full text-xs ${
-                  selectedCategory === category.id
-                    ? 'bg-white/20 text-white'
-                    : 'bg-gray-100 text-gray-600'
-                }`}>
-                  {count}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-
         {/* Featured Resources */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
           {featuredResources.map((resource, index) => {
@@ -155,7 +109,7 @@ export default function KnowledgeBase() {
                 key={index}
                 href={getResourceLink()}
                 className="card p-6 text-center hover:scale-105 transition-all duration-300 cursor-pointer block animate-fade-in-up glass-effect"
-                style={{ animationDelay: `${index * 150 + 600}ms` }}
+                style={{ animationDelay: `${index * 150 + 150}ms` }}
               >
                 <div className="inline-flex p-4 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-xl mb-4 animate-bounce-subtle">
                   <Icon className="h-8 w-8 text-white" />
@@ -167,6 +121,52 @@ export default function KnowledgeBase() {
                   <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </div>
               </Link>
+            );
+          })}
+        </div>
+
+        {/* Search Bar */}
+        <div className="max-w-2xl mx-auto mb-8 animate-fade-in-up animation-delay-600">
+          <div className="relative">
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search legal topics, guides, and resources..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-12 pr-4 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-lg glass-effect"
+              data-testid="search-input"
+            />
+          </div>
+        </div>
+
+        {/* Categories */}
+        <div className="flex flex-wrap justify-center gap-3 mb-12 animate-slide-in-right animation-delay-750">
+          {categories.map((category, index) => {
+            const Icon = category.icon;
+            const count = getCategoryCount(category.id);
+            return (
+              <button
+                key={category.id}
+                onClick={() => setSelectedCategory(category.id)}
+                className={`flex items-center space-x-2 px-4 py-2 rounded-full font-medium transition-all duration-200 hover:scale-105 hover:-translate-y-1 animate-fade-in-up ${
+                  selectedCategory === category.id
+                    ? `${category.color} text-white shadow-lg animate-bounce-subtle`
+                    : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200 glass-effect'
+                }`}
+                style={{ animationDelay: `${index * 100 + 850}ms` }}
+                data-testid={`category-${category.id}`}
+              >
+                <Icon className="h-4 w-4 animate-pulse-subtle" />
+                <span>{category.name}</span>
+                <span className={`ml-1 px-2 py-0.5 rounded-full text-xs ${
+                  selectedCategory === category.id
+                    ? 'bg-white/20 text-white'
+                    : 'bg-gray-100 text-gray-600'
+                }`}>
+                  {count}
+                </span>
+              </button>
             );
           })}
         </div>
