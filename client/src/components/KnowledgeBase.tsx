@@ -128,13 +128,13 @@ export default function KnowledgeBase() {
         {/* Search Bar */}
         <div className="max-w-2xl mx-auto mb-8 animate-fade-in-up animation-delay-600">
           <div className="relative">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-6 w-6 text-blue-500 animate-pulse-subtle" />
             <input
               type="text"
               placeholder="Search legal topics, guides, and resources..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-lg glass-effect"
+              className="w-full pl-14 pr-4 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-lg glass-effect shadow-md"
               data-testid="search-input"
             />
           </div>
