@@ -1,9 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { Upload, FileText, AlertCircle, CheckCircle } from 'lucide-react';
 import { apiRequest, queryClient } from '../lib/queryClient';
 
 export default function DocumentAnalysisPage() {
+  useEffect(() => {
+    // Scroll to top when page loads
+    window.scrollTo(0, 0);
+  }, []);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [analysisResult, setAnalysisResult] = useState<string | null>(null);
 
