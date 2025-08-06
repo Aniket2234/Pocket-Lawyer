@@ -1,12 +1,13 @@
 import React from 'react';
+import { Link } from 'wouter';
 import { Scale, Mail, Phone, MapPin, Facebook, Twitter, Linkedin, Instagram } from 'lucide-react';
 
 export default function Footer() {
   const quickLinks = [
     { name: 'Knowledge Base', href: '/knowledge' },
     { name: 'Chat Assistant', href: '/chat' },
-    { name: 'Legal Templates', href: '/legal-templates' },
-    { name: 'State Laws', href: '/state-law-guides' },
+    { name: 'Legal Templates', href: '/templates' },
+    { name: 'State Laws', href: '/guides' },
   ];
 
   const legalAreas = [
@@ -18,9 +19,9 @@ export default function Footer() {
   ];
 
   const resources = [
-    { name: 'Legal Document Templates', href: '/legal-templates' },
-    { name: 'Case Law Database', href: '/case-law' },
-    { name: 'State Law Guides', href: '/state-law-guides' },
+    { name: 'Legal Document Templates', href: '/templates' },
+    { name: 'Case Law Database', href: '/cases' },
+    { name: 'State Law Guides', href: '/guides' },
   ];
 
   return (
@@ -67,12 +68,12 @@ export default function Footer() {
             <ul className="space-y-2">
               {quickLinks.map((link) => (
                 <li key={link.name}>
-                  <a
+                  <Link
                     href={link.href}
                     className="text-gray-300 hover:text-white transition-colors duration-200"
                   >
                     {link.name}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -84,12 +85,12 @@ export default function Footer() {
             <ul className="space-y-2">
               {legalAreas.map((area) => (
                 <li key={area.name}>
-                  <a
+                  <Link
                     href={area.href}
                     className="text-gray-300 hover:text-white transition-colors duration-200"
                   >
                     {area.name}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -101,12 +102,12 @@ export default function Footer() {
             <ul className="space-y-2">
               {resources.map((resource) => (
                 <li key={resource.name}>
-                  <a
+                  <Link
                     href={resource.href}
                     className="text-gray-300 hover:text-white transition-colors duration-200"
                   >
                     {resource.name}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
