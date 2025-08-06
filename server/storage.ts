@@ -1531,6 +1531,191 @@ Arbitrator: [Name/Institution] Seat: [City]`,
         state: "Andaman and Nicobar Islands",
         category: "Tribal Protection Law",
         lastUpdated: new Date()
+      },
+
+      // Family Law Guides
+      {
+        title: "Maharashtra Family Law and Marriage Registration",
+        content: "Maharashtra follows Hindu Marriage Act 1955 and Special Marriage Act 1954. Marriage registration mandatory under Maharashtra Registration of Marriages Rules 2014. Online registration through gr.maharashtra.gov.in. Hindu Succession Act 1956 for inheritance. Maintenance under Section 125 CrPC and Hindu Adoption and Maintenance Act. Divorce procedures under respective personal laws. Child custody laws favor best interest of child. Domestic violence protection under PWDVA 2005. Inter-caste marriage incentive schemes. Court marriage procedures at Sub-Registrar offices.",
+        state: "Maharashtra",
+        category: "Family Law",
+        lastUpdated: new Date()
+      },
+      {
+        title: "Delhi Family Courts and Matrimonial Laws",
+        content: "Delhi has dedicated Family Courts under Delhi Family Courts Act 1984. Marriage registration under Delhi Marriage Registration Rules. Hindu Marriage Act, Muslim Personal Law, Christian Marriage Act applicable. Delhi Commission for Women handles matrimonial disputes. Legal aid available through Delhi State Legal Services Authority. Maintenance enforcement through Family Courts. Child welfare committees for adoption procedures. Domestic violence cases handled by Metropolitan Magistrates. Senior Citizens Maintenance Act for elderly care. Free legal aid for women in matrimonial cases.",
+        state: "Delhi",
+        category: "Family Law",
+        lastUpdated: new Date()
+      },
+      {
+        title: "Tamil Nadu Family Welfare and Women Protection",
+        content: "Tamil Nadu implements comprehensive family welfare policies. Marriage registration through local registrars mandatory. Tamil Nadu Prohibition of Harassment of Women Act 1998. Child marriage prevention through special courts. Dowry prohibition enforcement with dedicated cells. Family counseling centers in major cities. Legal aid to women through Tamil Nadu Women Development Corporation. Adoption procedures through Child Welfare Committees. Maintenance recovery through family courts. Protection of Women from Domestic Violence Act implementation.",
+        state: "Tamil Nadu",
+        category: "Family Law",
+        lastUpdated: new Date()
+      },
+      {
+        title: "West Bengal Family Dispute Resolution",
+        content: "West Bengal Family Welfare Department oversees matrimonial laws. Lok Adalats for family dispute resolution. Marriage registration under Bengal Excise Act provisions. Child welfare boards for adoption and custody. Bengal Social Service Act for family support. Maintenance enforcement through civil courts. Domestic violence protection cells in police stations. Legal aid for economically weaker sections. Joint family property disputes under Hindu Succession Act. Marriage counseling services through government centers.",
+        state: "West Bengal",
+        category: "Family Law",
+        lastUpdated: new Date()
+      },
+      {
+        title: "Karnataka Family Law Implementation",
+        content: "Karnataka follows comprehensive family law framework. Karnataka State Commission for Women addresses matrimonial issues. Online marriage registration through Karnataka government portal. Family courts in Bangalore, Mysore, and major cities. Child adoption through Karnataka State Adoption Resource Agency. Dowry prohibition implementation with strict enforcement. Domestic violence protection under state committees. Senior citizen welfare laws for elderly protection. Hindu undivided family property laws. Marriage dispute mediation through Lok Adalats.",
+        state: "Karnataka",
+        category: "Family Law",
+        lastUpdated: new Date()
+      },
+
+      // Employment Law Guides  
+      {
+        title: "Maharashtra Industrial Relations and Labor Laws",
+        content: "Maharashtra follows Maharashtra Recognition of Trade Unions and Prevention of Unfair Labour Practices Act 1971. Industrial Disputes Act with state amendments. Maharashtra Shops and Commercial Establishments Act 2017. Contract labor regulation through principal employer liability. Factories Act 1948 with state modifications. Minimum wages notification quarterly. Provident Fund and ESI compliance mandatory. Maharashtra Labour Welfare Fund contributions. Online compliance through Shrama Suvidha Portal. Workers compensation for industrial accidents. Sexual harassment prevention committees mandatory.",
+        state: "Maharashtra",
+        category: "Employment Law",
+        lastUpdated: new Date()
+      },
+      {
+        title: "Karnataka IT Sector Employment Regulations",
+        content: "Karnataka IT sector follows Karnataka Shops and Commercial Establishments Act 1961. Special Economic Zones employment regulations. Karnataka Contract Labour Act implementation. IT companies compliance under Factories Act exemptions. Karnataka Provident Fund and ESI regulations. Women safety in IT sector - night shift protections. Karnataka Industrial Employment Standing Orders. Gratuity Act implementation in IT sector. Karnataka Labour Welfare Fund for social security. Online compliance through Karnataka government portals.",
+        state: "Karnataka",
+        category: "Employment Law", 
+        lastUpdated: new Date()
+      },
+      {
+        title: "Tamil Nadu Manufacturing Sector Labor Laws",
+        content: "Tamil Nadu Industrial Relations Code implementation. Tamil Nadu Factories Act with amendments for manufacturing. Contract labour regulation in industrial estates. Tamil Nadu Industrial Employment Standing Orders Act. Minimum wages for different categories of workers. Tamil Nadu Labour Welfare Board for worker benefits. Industrial safety regulations strictly enforced. Women employment protection in factories. Apprenticeship training programs in industries. Worker compensation and social security schemes.",
+        state: "Tamil Nadu",
+        category: "Employment Law",
+        lastUpdated: new Date()
+      },
+      {
+        title: "Delhi Service Sector Employment Laws",
+        content: "Delhi service sector follows Delhi Shops and Commercial Establishments Act 1954. Delhi Contract Labour Act for outsourcing regulations. Delhi Minimum Wages Act with regular revisions. Delhi Labour Welfare Fund for social benefits. Service sector employment in NCR region. Delhi Industrial Relations Code provisions. Women safety measures in workplace mandatory. Delhi Factories Act for manufacturing units. Employee State Insurance and Provident Fund compliance. Sexual harassment prevention in service sector.",
+        state: "Delhi",
+        category: "Employment Law",
+        lastUpdated: new Date()
+      },
+      {
+        title: "Gujarat Industrial Labor and Trade Union Laws",
+        content: "Gujarat Industrial Relations Act 1965 for trade union recognition. Gujarat Factories Act implementation in industrial areas. Contract labour regulation in major industrial estates. Gujarat Labour Welfare Board operations. Minimum wages notification for various sectors. Gujarat Industrial Employment Standing Orders. Worker safety regulations in chemical and textile industries. Gujarat Provident Fund and social security compliance. Industrial dispute resolution through conciliation. Labour court procedures for employment disputes.",
+        state: "Gujarat",
+        category: "Employment Law",
+        lastUpdated: new Date()
+      },
+
+      // Tenant Rights Guides
+      {
+        title: "Maharashtra Rent Control and Tenant Protection",
+        content: "Maharashtra follows Maharashtra Rent Control Act 1999. Tenant protection against arbitrary eviction. Standard rent determination procedures. Repairs and maintenance obligations of landlords. Security deposit limitations - maximum 10 months rent. Tenant rights during redevelopment projects. Maharashtra Ownership Flats Act for cooperative societies. Rent agreement registration mandatory above 11 months. Tenant eviction only through due process. Dispute resolution through Rent Control Courts. Online rent agreement registration facility.",
+        state: "Maharashtra",
+        category: "Tenant Rights",
+        lastUpdated: new Date()
+      },
+      {
+        title: "Delhi Rent Control and Tenant Rights Protection",
+        content: "Delhi Rent Control Act 1958 protects tenant rights. Fair rent determination by Rent Control Authority. Tenant protection against unlawful eviction. Essential services (water, electricity) landlord responsibility. Security deposit regulation and return procedures. Rent increases subject to statutory limitations. Delhi Development Authority rental policies. Tenant rights in unauthorized colonies. Subletting regulations and permissions. Rent tribunal for dispute resolution.",
+        state: "Delhi",
+        category: "Tenant Rights",
+        lastUpdated: new Date()
+      },
+      {
+        title: "West Bengal Premises Tenancy and Tenant Rights",
+        content: "West Bengal Premises Tenancy Act 1997 governs tenant-landlord relations. Tenant protection against arbitrary eviction without court orders. Fair rent determination mechanisms. Security deposit limitations and refund procedures. Essential services provision by landlords mandatory. Rent agreement registration procedures. Tenant rights during property transfer. West Bengal Housing Board tenant policies. Dispute resolution through civil courts. Maintenance and repair obligations clearly defined.",
+        state: "West Bengal",
+        category: "Tenant Rights",
+        lastUpdated: new Date()
+      },
+      {
+        title: "Tamil Nadu Rent Control and Tenancy Laws",
+        content: "Tamil Nadu Buildings (Lease and Rent Control) Act 1960. Standard rent fixation by competent authorities. Tenant protection against wrongful eviction. Security deposit regulation - maximum 10 months advance. Landlord obligations for basic amenities provision. Rent agreement registration through sub-registrar offices. Tenant rights in case of property sale. Tamil Nadu Housing Board rental policies. Maintenance responsibility sharing between parties. Dispute resolution through Rent Control Courts.",
+        state: "Tamil Nadu",
+        category: "Tenant Rights",
+        lastUpdated: new Date()
+      },
+      {
+        title: "Karnataka Rent Control and Urban Tenancy",
+        content: "Karnataka Rent Control Act 2001 provides tenant protection framework. Fair rent determination through prescribed authorities. Tenant security against arbitrary eviction. Security deposit limitations and timeline for refund. Essential services (water, electricity, sanitation) provision. Rent agreement registration procedures online. Bangalore Development Authority rental policies. Tenant rights in slum rehabilitation projects. Subletting permission procedures. Civil court jurisdiction for tenancy disputes.",
+        state: "Karnataka",
+        category: "Tenant Rights",
+        lastUpdated: new Date()
+      },
+
+      // Consumer Rights Guides
+      {
+        title: "Maharashtra Consumer Protection and Rights",
+        content: "Maharashtra implements Consumer Protection Act 2019 comprehensively. State Consumer Disputes Redressal Commission operates in Mumbai. District consumer forums in all districts. Online complaint filing through National Consumer Helpline. Right to refund, replacement, and repair for defective goods. Consumer protection against unfair trade practices. Maharashtra State Consumer Helpline 1800-11-4000. Product liability provisions for manufacturers. E-commerce consumer protection guidelines. Consumer awareness programs by state government.",
+        state: "Maharashtra",
+        category: "Consumer Rights",
+        lastUpdated: new Date()
+      },
+      {
+        title: "Delhi Consumer Forums and Protection Mechanisms",
+        content: "Delhi State Consumer Disputes Redressal Commission in New Delhi. District consumer forums across Delhi districts. Consumer protection against misleading advertisements. Online dispute resolution for consumer complaints. Delhi consumer helpline for grievance redressal. Product safety standards enforcement. Service sector consumer protection (hospitals, schools, housing). Consumer awareness campaigns by Delhi government. E-commerce and digital payment consumer protection. Quick disposal of consumer cases through fast-track courts.",
+        state: "Delhi",
+        category: "Consumer Rights",
+        lastUpdated: new Date()
+      },
+      {
+        title: "Tamil Nadu Consumer Dispute Resolution",
+        content: "Tamil Nadu State Consumer Disputes Redressal Commission in Chennai. Consumer protection against medical negligence. Tamil Nadu Consumer Helpline for complaint registration. Consumer rights in public utility services. Product liability and defective goods compensation. Consumer protection in online transactions. Tamil Nadu Weights and Measures enforcement. Consumer awareness through government programs. Banking and financial services consumer protection. Insurance claim settlement consumer rights.",
+        state: "Tamil Nadu",
+        category: "Consumer Rights",
+        lastUpdated: new Date()
+      },
+      {
+        title: "Karnataka Consumer Protection Implementation",
+        content: "Karnataka State Consumer Disputes Redressal Commission operations. Consumer protection in IT and telecom services. Online consumer complaint portal by Karnataka government. Consumer rights in real estate transactions. Product safety and quality standards enforcement. Consumer protection against credit card fraud. Karnataka consumer helpline services. Educational institutions consumer protection. Healthcare services consumer rights. E-commerce consumer grievance redressal.",
+        state: "Karnataka",
+        category: "Consumer Rights",
+        lastUpdated: new Date()
+      },
+      {
+        title: "Gujarat Consumer Rights and Trade Practices",
+        content: "Gujarat State Consumer Disputes Redressal Commission oversight. Consumer protection in industrial products. Gujarat consumer helpline and grievance portal. Consumer rights in utility services (gas, electricity). Unfair trade practices prevention and penalties. Consumer protection in agricultural commodities. Gujarat weights and measures enforcement. Consumer awareness in rural areas. Banking and insurance consumer protection. Mobile and telecom services consumer rights.",
+        state: "Gujarat",
+        category: "Consumer Rights",
+        lastUpdated: new Date()
+      },
+
+      // Women's Safety Guides
+      {
+        title: "Maharashtra Women Safety and Protection Laws",
+        content: "Maharashtra implements comprehensive women safety framework. Maharashtra State Women Commission for complaint redressal. Women helpline 103 operational 24/7. Safe City Project implementation in major cities. Nirbhaya Fund utilization for women safety infrastructure. Maharashtra Maha-Mohila Police for women-specific crimes. Sexual harassment prevention committees in workplaces mandatory. Domestic violence protection officers in each district. Women police stations for sensitive crime investigation. CCTV surveillance in public spaces for women safety.",
+        state: "Maharashtra",
+        category: "Women's Safety",
+        lastUpdated: new Date()
+      },
+      {
+        title: "Delhi Women Safety and Security Initiatives",
+        content: "Delhi Commission for Women handles women safety complaints. Women helpline 181 and police helpline 100 integrated. Safe City Project with enhanced CCTV coverage. Himmat app for emergency assistance to women. Delhi Police special cell for crimes against women. Sexual harassment committees in government and private offices. Domestic violence counseling centers across Delhi. Women-only transport services (Pink Bus, Ladies Special trains). Safety audit of public spaces regularly conducted. Night shelters and safe houses for women in distress.",
+        state: "Delhi",
+        category: "Women's Safety",
+        lastUpdated: new Date()
+      },
+      {
+        title: "Tamil Nadu Women Protection and Empowerment",
+        content: "Tamil Nadu State Commission for Women active in safety measures. Women helpline 1091 for emergency assistance. Amma Police Stations exclusively for women-related complaints. All Women Police Stations in major cities. Sexual harassment prevention through VISHAKA guidelines implementation. Domestic violence protection officers in all districts. Tamil Nadu Prohibition of Harassment of Women Act 1998 enforcement. Women safety in public transport - reserved seats and compartments. Self-defense training programs for women and girls. Economic empowerment programs for women's independence.",
+        state: "Tamil Nadu",
+        category: "Women's Safety",
+        lastUpdated: new Date()
+      },
+      {
+        title: "West Bengal Women Safety and Rights Protection",
+        content: "West Bengal State Women Commission oversight for safety issues. Women helpline number and complaint registration system. Special courts for crimes against women (POCSO, domestic violence). West Bengal Police women safety initiatives. Sexual harassment prevention in educational institutions mandatory. Domestic violence counselors in police stations. Women police stations in Kolkata and major cities. Safety measures in public transport for women. Night patrolling in areas with women workforce. Legal aid services for women through state legal authority.",
+        state: "West Bengal",
+        category: "Women's Safety",
+        lastUpdated: new Date()
+      },
+      {
+        title: "Karnataka Women Safety and Security Framework",
+        content: "Karnataka State Women Development Corporation safety initiatives. Women helpline 1091 and emergency response system. Bangalore Police women safety measures and patrolling. Sexual harassment prevention committees across organizations. Domestic violence protection and counseling services. Karnataka State Commission for Women complaint redressal. Women police stations for sensitive crime investigation. Safe City initiatives with technology integration. Self-defense training and awareness programs. Economic empowerment linked with safety and security measures.",
+        state: "Karnataka",
+        category: "Women's Safety",
+        lastUpdated: new Date()
       }
     ];
 
