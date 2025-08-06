@@ -18,11 +18,9 @@ export default function Footer() {
   ];
 
   const resources = [
+    { name: 'Legal Document Templates', href: '/legal-templates' },
     { name: 'Case Law Database', href: '/case-law' },
-    { name: 'Document Templates', href: '/legal-templates' },
     { name: 'State Law Guides', href: '/state-law-guides' },
-    { name: 'Document Analysis', href: '/document-analysis' },
-    { name: 'AI Chat Assistant', href: '/chat' },
   ];
 
   return (
