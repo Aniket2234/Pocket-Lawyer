@@ -5,7 +5,6 @@ export default function Footer() {
   const quickLinks = [
     { name: 'Knowledge Base', href: '/knowledge' },
     { name: 'Chat Assistant', href: '/chat' },
-    { name: 'Consultation', href: '/consultation' },
     { name: 'Legal Templates', href: '/legal-templates' },
     { name: 'State Laws', href: '/state-law-guides' },
   ];
