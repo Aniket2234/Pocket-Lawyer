@@ -1,15 +1,18 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Search, MapPin, BookOpen, Filter } from 'lucide-react';
 
 const states = [
-  'All States', 'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 
-  'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 
-  'Kentucky', 'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 
-  'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 
-  'New Mexico', 'New York', 'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 
-  'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 
-  'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming'
+  'All States', 
+  // States
+  'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa', 'Gujarat', 
+  'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka', 'Kerala', 'Madhya Pradesh', 
+  'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab', 
+  'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 
+  'West Bengal',
+  // Union Territories
+  'Andaman and Nicobar Islands', 'Chandigarh', 'Dadra and Nagar Haveli and Daman and Diu', 
+  'Delhi', 'Jammu and Kashmir', 'Ladakh', 'Lakshadweep', 'Puducherry'
 ];
 
 const categories = [
@@ -29,6 +32,11 @@ export default function StateLawGuidesPage() {
   const [selectedCategory, setSelectedCategory] = useState('All Categories');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedGuide, setSelectedGuide] = useState<any>(null);
+  
+  useEffect(() => {
+    // Scroll to top when page loads
+    window.scrollTo(0, 0);
+  }, []);
 
   const { data: guides, isLoading } = useQuery({
     queryKey: ['/api/guides', { 
@@ -46,10 +54,10 @@ export default function StateLawGuidesPage() {
     <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">State Law Guides</h1>
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">State & UT Law Guides</h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Comprehensive guides to state-specific laws and regulations. Find legal information 
-            tailored to your jurisdiction.
+            Comprehensive guides to Indian state and Union Territory specific laws and regulations. 
+            Find legal information tailored to your jurisdiction across India.
           </p>
         </div>
 
@@ -75,7 +83,7 @@ export default function StateLawGuidesPage() {
               <div className="mb-6">
                 <div className="flex items-center mb-4">
                   <MapPin className="h-4 w-4 mr-2 text-gray-600" />
-                  <h3 className="font-semibold text-gray-900">State</h3>
+                  <h3 className="font-semibold text-gray-900">State/UT</h3>
                 </div>
                 <select
                   value={selectedState}
