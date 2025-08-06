@@ -121,6 +121,33 @@
   }
 }
 
+@keyframes scanning {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(2800%);
+  }
+}
+
+@keyframes progress {
+  0% {
+    width: 0%;
+  }
+  25% {
+    width: 25%;
+  }
+  50% {
+    width: 50%;
+  }
+  75% {
+    width: 75%;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
 @keyframes slideInLeft {
   from {
     opacity: 0;
@@ -177,6 +204,14 @@
 
 .animate-bounce-subtle {
   animation: bounce 2s infinite;
+}
+
+.animate-scanning {
+  animation: scanning 2s ease-in-out infinite;
+}
+
+.animate-progress {
+  animation: progress 4s ease-in-out infinite;
 }
 
 /* Legal themed background patterns */

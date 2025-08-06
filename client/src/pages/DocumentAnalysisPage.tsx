@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { Upload, FileText, AlertCircle, CheckCircle } from 'lucide-react';
+import { Upload, FileText, AlertCircle, CheckCircle, Search, Eye, Brain, Zap } from 'lucide-react';
 import { apiRequest, queryClient } from '../lib/queryClient';
 
 export default function DocumentAnalysisPage() {
@@ -111,7 +111,58 @@ export default function DocumentAnalysisPage() {
               Analysis Results
             </h2>
 
-            {analysisResult ? (
+{analyzeDocumentMutation.isPending ? (
+              <div className="text-center py-12">
+                <div className="relative mb-8">
+                  {/* Main Document Icon */}
+                  <div className="relative mx-auto w-20 h-24 bg-blue-100 rounded-lg border-2 border-blue-300 animate-pulse">
+                    <FileText className="h-12 w-12 text-blue-600 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
+                  </div>
+                  
+                  {/* Scanning Beam Animation */}
+                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-24 h-28 overflow-hidden rounded-lg">
+                    <div className="w-full h-1 bg-gradient-to-r from-transparent via-blue-400 to-transparent animate-scanning opacity-70"></div>
+                  </div>
+                  
+                  {/* Floating Analysis Icons */}
+                  <div className="absolute top-0 left-0 w-full h-full">
+                    <Search className="h-6 w-6 text-blue-500 absolute top-4 left-8 animate-float opacity-60" style={{animationDelay: '0s'}} />
+                    <Eye className="h-5 w-5 text-green-500 absolute top-8 right-8 animate-float opacity-60" style={{animationDelay: '1s'}} />
+                    <Brain className="h-6 w-6 text-purple-500 absolute bottom-6 left-6 animate-float opacity-60" style={{animationDelay: '2s'}} />
+                    <Zap className="h-5 w-5 text-yellow-500 absolute bottom-4 right-6 animate-float opacity-60" style={{animationDelay: '0.5s'}} />
+                  </div>
+                </div>
+                
+                <div className="space-y-4">
+                  <h3 className="text-xl font-semibold text-blue-700 animate-pulse">Analyzing Document...</h3>
+                  
+                  {/* Progress Steps */}
+                  <div className="space-y-3 max-w-sm mx-auto">
+                    <div className="flex items-center text-sm">
+                      <div className="w-3 h-3 bg-blue-500 rounded-full mr-3 animate-pulse"></div>
+                      <span className="text-gray-700">Reading document content</span>
+                    </div>
+                    <div className="flex items-center text-sm">
+                      <div className="w-3 h-3 bg-green-500 rounded-full mr-3 animate-pulse" style={{animationDelay: '1s'}}></div>
+                      <span className="text-gray-700">Identifying legal clauses</span>
+                    </div>
+                    <div className="flex items-center text-sm">
+                      <div className="w-3 h-3 bg-purple-500 rounded-full mr-3 animate-pulse" style={{animationDelay: '2s'}}></div>
+                      <span className="text-gray-700">Analyzing risks and opportunities</span>
+                    </div>
+                    <div className="flex items-center text-sm">
+                      <div className="w-3 h-3 bg-yellow-500 rounded-full mr-3 animate-pulse" style={{animationDelay: '3s'}}></div>
+                      <span className="text-gray-700">Generating insights</span>
+                    </div>
+                  </div>
+                  
+                  {/* Progress Bar */}
+                  <div className="w-full max-w-sm mx-auto bg-gray-200 rounded-full h-2 mt-6">
+                    <div className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full animate-progress"></div>
+                  </div>
+                </div>
+              </div>
+            ) : analysisResult ? (
               <div className="space-y-4">
                 <div className="flex items-center text-green-600 mb-4">
                   <CheckCircle className="h-5 w-5 mr-2" />
