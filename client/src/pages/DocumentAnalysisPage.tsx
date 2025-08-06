@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { Upload, FileText, AlertCircle, CheckCircle, Search, Eye, Brain, Zap } from 'lucide-react';
+import { Upload, FileText, AlertCircle, CheckCircle, Search, Eye, Brain, Zap, Scale, Gavel, Book } from 'lucide-react';
 import { apiRequest, queryClient } from '../lib/queryClient';
+import LegalBackground from '../components/LegalBackground';
 
 export default function DocumentAnalysisPage() {
   useEffect(() => {
@@ -46,8 +47,37 @@ export default function DocumentAnalysisPage() {
   };
 
   return (
-    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto">
+    <div className="relative min-h-screen py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-slate-50 to-blue-50 overflow-hidden">
+      {/* Animated Legal Background */}
+      <LegalBackground variant="page" className="opacity-15" />
+      
+      {/* Floating Legal Icons */}
+      <div className="absolute top-20 left-10 animate-float opacity-10">
+        <Scale className="h-20 w-20 text-blue-600" />
+      </div>
+      <div className="absolute top-1/3 right-16 animate-float animation-delay-300 opacity-10">
+        <Gavel className="h-16 w-16 text-emerald-600" />
+      </div>
+      <div className="absolute bottom-1/4 left-16 animate-float animation-delay-150 opacity-10">
+        <Book className="h-18 w-18 text-purple-600" />
+      </div>
+      <div className="absolute bottom-20 right-20 animate-float animation-delay-450 opacity-10">
+        <FileText className="h-14 w-14 text-indigo-600" />
+      </div>
+      
+      {/* Animated Document Icons */}
+      <div className="absolute top-1/2 left-8 animate-pulse opacity-5">
+        <FileText className="h-24 w-24 text-gray-400" />
+      </div>
+      <div className="absolute top-1/4 right-8 animate-pulse animation-delay-300 opacity-5">
+        <FileText className="h-16 w-16 text-gray-400" />
+      </div>
+      
+      {/* Gradient Orbs */}
+      <div className="absolute top-10 right-1/4 w-32 h-32 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full opacity-10 animate-pulse"></div>
+      <div className="absolute bottom-10 left-1/4 w-24 h-24 bg-gradient-to-r from-emerald-400 to-blue-400 rounded-full opacity-10 animate-pulse animation-delay-300"></div>
+      
+      <div className="relative z-10 max-w-4xl mx-auto">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Document Analysis</h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">

@@ -58,6 +58,10 @@
   .animation-delay-300 {
     animation-delay: 300ms;
   }
+  
+  .animation-delay-450 {
+    animation-delay: 450ms;
+  }
 }
 
 /* Custom animations */
