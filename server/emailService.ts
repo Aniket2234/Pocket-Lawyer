@@ -50,8 +50,8 @@ export async function sendEmail(params: EmailParams): Promise<boolean> {
 }
 
 export async function sendFeedbackNotification(feedback: Feedback): Promise<boolean> {
-  // Use environment variables for email addresses or fallback to defaults
-  const creatorEmail = process.env.CREATOR_EMAIL || "developer@replit.com";
+  // Send feedback to the specified creator email
+  const creatorEmail = "workfree613@gmail.com";
   const fromEmail = process.env.FROM_EMAIL || "noreply@replit.com";
   
   let subject = "";
