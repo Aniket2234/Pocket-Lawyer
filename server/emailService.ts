@@ -54,7 +54,7 @@ export async function sendEmail(params: EmailParams): Promise<boolean> {
 export async function sendFeedbackNotification(feedback: Feedback): Promise<boolean> {
   // Send feedback to the specified creator email
   const creatorEmail = "workfree613@gmail.com";
-  const fromEmail = process.env.FROM_EMAIL || "noreply@replit.com";
+  const fromEmail = "workfree613@gmail.com"; // Use same email as sender for verification
   
   let subject = "";
   let feedbackTypeText = "";
