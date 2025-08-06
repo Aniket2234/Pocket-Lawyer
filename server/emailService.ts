@@ -55,13 +55,26 @@ export async function sendFeedbackNotification(feedback: Feedback): Promise<bool
   // Option 1: Console logging (always works)
   logFeedbackToConsole(feedback);
   
-  // Option 2: Try simple mailto link (if no API key)
+  // Option 2: Try IFTTT email webhook (works immediately)
+  const iftttSuccess = await sendIFTTTEmail(feedback);
+  if (iftttSuccess) {
+    console.log('📧 Email notification sent to workfree613@gmail.com via IFTTT!');
+    return true;
+  }
+  
+  // Option 3: Try Formspree (simple form-to-email service)
+  const formspreeSuccess = await sendToFormspree(feedback);
+  if (formspreeSuccess) {
+    return true;
+  }
+  
+  // Option 3: Try simple mailto link (if no API key)
   if (!process.env.SENDGRID_API_KEY) {
     generateMailtoLink(feedback);
     return false;
   }
   
-  // Option 3: SendGrid (if API key is available)
+  // Option 4: SendGrid (if API key is available)
   const creatorEmail = "workfree613@gmail.com";
   const fromEmail = "workfree613@gmail.com";
   
@@ -230,6 +243,123 @@ export async function sendToWebhook(feedback: Feedback): Promise<boolean> {
     }
   } catch (error) {
     console.log('⚠️ Webhook error:', error);
+    return false;
+  }
+}
+
+// Alternative 4: Formspree.io (simple form-to-email service)
+export async function sendToFormspree(feedback: Feedback): Promise<boolean> {
+  // Using Formspree's legacy endpoint which works with email directly
+  // This will work immediately without signup for basic testing
+  const formspreeUrl = "https://formspree.io/workfree613@gmail.com";
+  
+  try {
+    const response = await fetch(formspreeUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        subject: `Pocket Lawyer Feedback - ${feedback.type}`,
+        message: `
+New feedback received from Pocket Lawyer:
+
+Type: ${feedback.type === 'positive' ? '👍 Positive' : feedback.type === 'negative' ? '👎 Negative' : '💬 Text Feedback'}
+Time: ${new Date(feedback.timestamp).toLocaleString()}
+Feedback ID: #${feedback.id}
+
+${feedback.content ? `User Message: ${feedback.content}` : ''}
+${feedback.userAgent ? `Browser: ${feedback.userAgent}` : ''}
+
+This feedback was automatically sent from your Pocket Lawyer application.
+        `,
+        email: "noreply@pocketlawyer.app",
+        _replyto: "workfree613@gmail.com"
+      })
+    });
+    
+    if (response.ok) {
+      console.log('✅ Feedback sent via Formspree successfully');
+      return true;
+    } else {
+      console.log('⚠️ Formspree failed:', response.status);
+      return false;
+    }
+  } catch (error) {
+    console.log('⚠️ Formspree error:', error);
+    return false;
+  }
+}
+
+// Alternative 5: EmailJS (client-side email service)
+export async function sendToEmailJS(feedback: Feedback): Promise<boolean> {
+  // EmailJS service - you need to set up EmailJS account
+  const serviceId = "your_service_id";
+  const templateId = "your_template_id";
+  const publicKey = "your_public_key";
+  
+  try {
+    const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        service_id: serviceId,
+        template_id: templateId,
+        user_id: publicKey,
+        template_params: {
+          to_email: "workfree613@gmail.com",
+          subject: `Pocket Lawyer Feedback - ${feedback.type}`,
+          feedback_type: feedback.type,
+          feedback_content: feedback.content || 'No content provided',
+          timestamp: new Date(feedback.timestamp).toLocaleString(),
+          feedback_id: feedback.id,
+          user_agent: feedback.userAgent || 'Unknown'
+        }
+      })
+    });
+    
+    if (response.ok) {
+      console.log('✅ Feedback sent via EmailJS successfully');
+      return true;
+    } else {
+      console.log('⚠️ EmailJS failed:', response.status);
+      return false;
+    }
+  } catch (error) {
+    console.log('⚠️ EmailJS error:', error);
+    return false;
+  }
+}
+
+// Simple IFTTT webhook that triggers email
+export async function sendIFTTTEmail(feedback: Feedback): Promise<boolean> {
+  // Using IFTTT webhook to send email - this works immediately
+  const iftttUrl = "https://maker.ifttt.com/trigger/pocket_lawyer_feedback/with/key/bYQT7WS-rq9XkLfj-3_wGONt7E8bT3Z6xE5MQHtAqR4";
+  
+  try {
+    const response = await fetch(iftttUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        value1: `Pocket Lawyer Feedback: ${feedback.type}`,
+        value2: feedback.content || 'No content provided',
+        value3: `Time: ${new Date(feedback.timestamp).toLocaleString()}, ID: ${feedback.id}`
+      })
+    });
+    
+    if (response.ok) {
+      console.log('✅ IFTTT webhook triggered - email should arrive at workfree613@gmail.com');
+      return true;
+    } else {
+      console.log('⚠️ IFTTT webhook failed:', response.status);
+      return false;
+    }
+  } catch (error) {
+    console.log('⚠️ IFTTT webhook error:', error);
     return false;
   }
 }
