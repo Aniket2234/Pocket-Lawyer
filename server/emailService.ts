@@ -52,9 +52,18 @@ export async function sendEmail(params: EmailParams): Promise<boolean> {
 }
 
 export async function sendFeedbackNotification(feedback: Feedback): Promise<boolean> {
-  // Send feedback to the specified creator email
+  // Option 1: Console logging (always works)
+  logFeedbackToConsole(feedback);
+  
+  // Option 2: Try simple mailto link (if no API key)
+  if (!process.env.SENDGRID_API_KEY) {
+    generateMailtoLink(feedback);
+    return false;
+  }
+  
+  // Option 3: SendGrid (if API key is available)
   const creatorEmail = "workfree613@gmail.com";
-  const fromEmail = "workfree613@gmail.com"; // Use same email as sender for verification
+  const fromEmail = "workfree613@gmail.com";
   
   let subject = "";
   let feedbackTypeText = "";
@@ -144,4 +153,83 @@ Feedback ID: #${feedback.id}
     text: textContent,
     html: htmlContent,
   });
+}
+
+// Alternative 1: Log feedback to console (always available)
+function logFeedbackToConsole(feedback: Feedback) {
+  console.log('\n' + '='.repeat(60));
+  console.log('📧 NEW FEEDBACK RECEIVED');
+  console.log('='.repeat(60));
+  console.log(`🔸 Type: ${feedback.type === 'positive' ? '👍 Positive' : feedback.type === 'negative' ? '👎 Negative' : '💬 Text Feedback'}`);
+  console.log(`🔸 Time: ${new Date(feedback.timestamp).toLocaleString()}`);
+  console.log(`🔸 ID: #${feedback.id}`);
+  
+  if (feedback.content) {
+    console.log(`🔸 Message:`);
+    console.log(`   "${feedback.content}"`);
+  }
+  
+  if (feedback.userAgent) {
+    console.log(`🔸 Browser: ${feedback.userAgent}`);
+  }
+  
+  console.log('='.repeat(60));
+  console.log('💡 Alternative ways to receive emails:');
+  console.log('   1. Check the console logs above');
+  console.log('   2. Use webhook services like webhook.site');
+  console.log('   3. Set up a simple email service like Formspree');
+  console.log('   4. Use Gmail SMTP with app password');
+  console.log('='.repeat(60) + '\n');
+}
+
+// Alternative 2: Generate mailto link for easy email creation
+function generateMailtoLink(feedback: Feedback) {
+  const subject = encodeURIComponent(`Feedback from Pocket Lawyer - ${feedback.type}`);
+  const body = encodeURIComponent(`
+New feedback received:
+
+Type: ${feedback.type === 'positive' ? '👍 Positive' : feedback.type === 'negative' ? '👎 Negative' : '💬 Text Feedback'}
+Time: ${new Date(feedback.timestamp).toLocaleString()}
+ID: #${feedback.id}
+
+${feedback.content ? `Message: ${feedback.content}` : ''}
+${feedback.userAgent ? `Browser: ${feedback.userAgent}` : ''}
+  `);
+  
+  const mailtoLink = `mailto:workfree613@gmail.com?subject=${subject}&body=${body}`;
+  console.log('\n📧 Mailto link generated (copy and paste in browser):');
+  console.log(mailtoLink);
+  console.log('\n');
+}
+
+// Alternative 3: Send to webhook (simple HTTP POST)
+export async function sendToWebhook(feedback: Feedback): Promise<boolean> {
+  // You can use services like webhook.site, requestbin.com, or pipedream.com
+  // Just replace this URL with your webhook URL
+  const webhookUrl = "https://webhook.site/your-unique-url"; // Replace with your webhook URL
+  
+  try {
+    const response = await fetch(webhookUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        timestamp: new Date().toISOString(),
+        feedback: feedback,
+        source: 'Pocket Lawyer App'
+      })
+    });
+    
+    if (response.ok) {
+      console.log('✅ Feedback sent to webhook successfully');
+      return true;
+    } else {
+      console.log('⚠️ Webhook failed:', response.status);
+      return false;
+    }
+  } catch (error) {
+    console.log('⚠️ Webhook error:', error);
+    return false;
+  }
 }
