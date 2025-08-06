@@ -1,16 +1,8 @@
 import { MailService } from '@sendgrid/mail';
 import type { Feedback } from '@shared/schema';
 
-// In development, make SendGrid optional
-const isDevelopment = process.env.NODE_ENV === 'development';
-if (!process.env.SENDGRID_API_KEY && !isDevelopment) {
-  throw new Error("SENDGRID_API_KEY environment variable must be set in production");
-}
-
+// Email service disabled - feedback will be logged instead
 const mailService = new MailService();
-if (process.env.SENDGRID_API_KEY) {
-  mailService.setApiKey(process.env.SENDGRID_API_KEY);
-}
 
 interface EmailParams {
   to: string;
@@ -21,32 +13,14 @@ interface EmailParams {
 }
 
 export async function sendEmail(params: EmailParams): Promise<boolean> {
-  // In development without API key, just log and return success
-  if (!process.env.SENDGRID_API_KEY && process.env.NODE_ENV === 'development') {
-    console.log('Development mode: Email would be sent:', {
-      to: params.to,
-      from: params.from,
-      subject: params.subject
-    });
-    return true;
-  }
-
-  try {
-    const emailData: any = {
-      to: params.to,
-      from: params.from,
-      subject: params.subject,
-    };
-    
-    if (params.text) emailData.text = params.text;
-    if (params.html) emailData.html = params.html;
-    
-    await mailService.send(emailData);
-    return true;
-  } catch (error) {
-    console.error('SendGrid email error:', error);
-    return false;
-  }
+  // Email service disabled - just log the email content
+  console.log('📧 Email notification (email service disabled):', {
+    to: params.to,
+    from: params.from,
+    subject: params.subject,
+    content: params.text || params.html
+  });
+  return true;
 }
 
 export async function sendFeedbackNotification(feedback: Feedback): Promise<boolean> {

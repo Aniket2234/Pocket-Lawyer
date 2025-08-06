@@ -286,13 +286,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validatedData = insertFeedbackSchema.parse(req.body);
       const feedback = await storage.createFeedback(validatedData);
       
-      // Send email notification to app creator
+      // Log feedback notification (email service disabled)
       try {
         await sendFeedbackNotification(feedback);
-        console.log(`Feedback notification email sent for feedback #${feedback.id}`);
-      } catch (emailError) {
-        console.error("Failed to send feedback notification email:", emailError);
-        // Continue with response even if email fails
+        console.log(`✅ Feedback #${feedback.id} received and logged`);
+      } catch (error) {
+        console.error("Failed to log feedback notification:", error);
       }
       
       res.json(feedback);
