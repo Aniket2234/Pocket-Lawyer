@@ -1,12 +1,16 @@
 import { MailService } from '@sendgrid/mail';
 import type { Feedback } from '@shared/schema';
 
-if (!process.env.SENDGRID_API_KEY) {
-  throw new Error("SENDGRID_API_KEY environment variable must be set");
+// In development, make SendGrid optional
+const isDevelopment = process.env.NODE_ENV === 'development';
+if (!process.env.SENDGRID_API_KEY && !isDevelopment) {
+  throw new Error("SENDGRID_API_KEY environment variable must be set in production");
 }
 
 const mailService = new MailService();
-mailService.setApiKey(process.env.SENDGRID_API_KEY!);
+if (process.env.SENDGRID_API_KEY) {
+  mailService.setApiKey(process.env.SENDGRID_API_KEY);
+}
 
 interface EmailParams {
   to: string;
@@ -17,14 +21,27 @@ interface EmailParams {
 }
 
 export async function sendEmail(params: EmailParams): Promise<boolean> {
+  // In development without API key, just log and return success
+  if (!process.env.SENDGRID_API_KEY && process.env.NODE_ENV === 'development') {
+    console.log('Development mode: Email would be sent:', {
+      to: params.to,
+      from: params.from,
+      subject: params.subject
+    });
+    return true;
+  }
+
   try {
-    await mailService.send({
+    const emailData: any = {
       to: params.to,
       from: params.from,
       subject: params.subject,
-      text: params.text,
-      html: params.html,
-    });
+    };
+    
+    if (params.text) emailData.text = params.text;
+    if (params.html) emailData.html = params.html;
+    
+    await mailService.send(emailData);
     return true;
   } catch (error) {
     console.error('SendGrid email error:', error);
