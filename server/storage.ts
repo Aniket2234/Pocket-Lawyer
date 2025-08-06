@@ -1273,7 +1273,7 @@ Arbitrator: [Name/Institution] Seat: [City]`,
   }
 
   private initializeStateLawGuides() {
-    // Comprehensive state law guides for all 28 states and 8 union territories of India
+    // Comprehensive state law guides for all 29 Indian states and Union Territories
     const guides = [
       // Major States - Detailed Guides
       {
