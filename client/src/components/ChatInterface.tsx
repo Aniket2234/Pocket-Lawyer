@@ -21,9 +21,12 @@ export default function ChatInterface() {
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+    }
   };
 
   useEffect(() => {
@@ -95,7 +98,7 @@ export default function ChatInterface() {
         {/* Chat Container */}
         <div className="card p-6 h-[600px] flex flex-col">
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto space-y-4 mb-6">
+          <div ref={messagesContainerRef} className="flex-1 overflow-y-auto space-y-4 mb-6">
             {messages.map((message) => (
               <div
                 key={message.id}
