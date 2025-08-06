@@ -45,10 +45,10 @@ export default function StateLawGuidesPage() {
     }],
   });
 
-  const filteredGuides = guides?.filter((guide: any) =>
+  const filteredGuides = guides ? guides.filter((guide: any) =>
     guide.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     guide.content.toLowerCase().includes(searchQuery.toLowerCase())
-  ) || [];
+  ) : [];
 
   return (
     <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">

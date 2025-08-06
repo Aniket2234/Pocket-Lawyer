@@ -59,9 +59,9 @@ export default function KnowledgeBase() {
     },
     {
       title: 'State Law Guides',
-      description: 'Comprehensive guides covering laws and regulations for all 50 states.',
+      description: 'Comprehensive guides covering laws and regulations for 29 states and 7 union territories.',
       icon: Book,
-      count: '50 State Guides',
+      count: '29 States & 7 UTs',
     },
   ];
 
