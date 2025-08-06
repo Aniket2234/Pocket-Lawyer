@@ -3,28 +3,28 @@ import { Scale, Mail, Phone, MapPin, Facebook, Twitter, Linkedin, Instagram } fr
 
 export default function Footer() {
   const quickLinks = [
-    { name: 'About Us', href: '#' },
-    { name: 'How It Works', href: '#' },
-    { name: 'Pricing', href: '#' },
-    { name: 'FAQ', href: '#' },
-    { name: 'Contact', href: '#' },
+    { name: 'Knowledge Base', href: '/knowledge' },
+    { name: 'Chat Assistant', href: '/chat' },
+    { name: 'Consultation', href: '/consultation' },
+    { name: 'Legal Templates', href: '/legal-templates' },
+    { name: 'State Laws', href: '/state-law-guides' },
   ];
 
   const legalAreas = [
-    { name: 'Business Law', href: '#' },
-    { name: 'Family Law', href: '#' },
-    { name: 'Personal Injury', href: '#' },
-    { name: 'Real Estate', href: '#' },
-    { name: 'Employment Law', href: '#' },
-    { name: 'Criminal Defense', href: '#' },
+    { name: 'Constitutional Law', href: '/knowledge?category=constitutional' },
+    { name: 'Criminal Law', href: '/knowledge?category=criminal' },
+    { name: 'Civil Law', href: '/knowledge?category=civil' },
+    { name: 'Corporate Law', href: '/knowledge?category=corporate' },
+    { name: 'Family Law', href: '/knowledge?category=family' },
+    { name: 'Property Law', href: '/knowledge?category=property' },
   ];
 
   const resources = [
-    { name: 'Legal Blog', href: '#' },
-    { name: 'Document Templates', href: '#' },
-    { name: 'Case Studies', href: '#' },
-    { name: 'Legal Dictionary', href: '#' },
-    { name: 'State Law Guides', href: '#' },
+    { name: 'Case Law Database', href: '/case-law' },
+    { name: 'Document Templates', href: '/legal-templates' },
+    { name: 'State Law Guides', href: '/state-law-guides' },
+    { name: 'Document Analysis', href: '/document-analysis' },
+    { name: 'AI Chat Assistant', href: '/chat' },
   ];
 
   return (
@@ -44,23 +44,23 @@ export default function Footer() {
             </div>
             
             <p className="text-gray-300 mb-6 leading-relaxed">
-              Your trusted AI-powered legal assistant providing instant guidance, 
-              document analysis, and connections to professional attorneys. 
-              Making legal help accessible to everyone.
+              Your comprehensive AI-powered legal assistant for Indian law. Get instant guidance on 
+              constitutional, criminal, civil, and corporate matters with access to case law, 
+              state-specific guides, and document templates across all 28 states and 8 union territories.
             </p>
             
             <div className="space-y-3">
               <div className="flex items-center space-x-3 text-gray-300">
                 <Mail className="h-5 w-5 text-blue-400" />
-                <span>support@pocketlawyer.ai</span>
+                <span>support@pocketlawyer.in</span>
               </div>
               <div className="flex items-center space-x-3 text-gray-300">
                 <Phone className="h-5 w-5 text-blue-400" />
-                <span>1-800-LAWYER-AI</span>
+                <span>+91-1800-LEGAL-AI</span>
               </div>
               <div className="flex items-center space-x-3 text-gray-300">
                 <MapPin className="h-5 w-5 text-blue-400" />
-                <span>San Francisco, CA</span>
+                <span>Mumbai, Maharashtra, India</span>
               </div>
             </div>
           </div>
@@ -121,9 +121,10 @@ export default function Footer() {
         <div className="border-t border-gray-800 mt-12 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="text-gray-400 text-sm mb-4 md:mb-0">
-              © 2024 Pocket Lawyer. All rights reserved. | 
+              © 2025 Pocket Lawyer India. All rights reserved. | 
               <a href="#" className="hover:text-white ml-1">Privacy Policy</a> | 
-              <a href="#" className="hover:text-white ml-1">Terms of Service</a>
+              <a href="#" className="hover:text-white ml-1">Terms of Service</a> | 
+              <a href="#" className="hover:text-white ml-1">Legal Disclaimer</a>
             </div>
             
             <div className="flex space-x-4">
@@ -141,9 +142,9 @@ export default function Footer() {
           
           <div className="mt-6 p-4 bg-gray-800 rounded-lg">
             <p className="text-xs text-gray-400 text-center">
-              <strong>Legal Disclaimer:</strong> This platform provides general legal information and AI-assisted guidance only. 
-              It does not constitute legal advice and should not be relied upon as a substitute for consultation with a qualified attorney. 
-              Always consult with a licensed lawyer for specific legal matters.
+              <strong>Legal Disclaimer:</strong> This platform provides general legal information about Indian law and AI-assisted guidance only. 
+              It does not constitute legal advice and should not be relied upon as a substitute for consultation with a qualified advocate or lawyer 
+              registered with the Bar Council of India. Always consult with a licensed legal practitioner for specific legal matters and court proceedings.
             </p>
           </div>
         </div>
