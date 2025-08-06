@@ -25,9 +25,7 @@ export default function DocumentAnalysisPage() {
     },
   });
 
-  const { data: previousAnalyses } = useQuery({
-    queryKey: ['/api/documents'],
-  });
+
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -216,26 +214,7 @@ export default function DocumentAnalysisPage() {
           </div>
         </div>
 
-        {/* Previous Analyses */}
-        {previousAnalyses && previousAnalyses.length > 0 && (
-          <div className="mt-12">
-            <h2 className="text-2xl font-semibold mb-6">Previous Analyses</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {previousAnalyses.map((analysis: any) => (
-                <div key={analysis.id} className="card p-6">
-                  <div className="flex items-center mb-3">
-                    <FileText className="h-5 w-5 text-blue-600 mr-2" />
-                    <h3 className="font-medium truncate">{analysis.fileName}</h3>
-                  </div>
-                  <p className="text-sm text-gray-500 mb-3">{analysis.fileType}</p>
-                  <p className="text-xs text-gray-400">
-                    {new Date(analysis.timestamp).toLocaleDateString()}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+
       </div>
     </div>
   );
