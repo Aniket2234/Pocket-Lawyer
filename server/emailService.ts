@@ -4,9 +4,13 @@ import type { Feedback } from '@shared/schema';
 // Email service for feedback notifications
 const mailService = new MailService();
 
-// Only set API key if available
+// Debug API key and set if available
 if (process.env.SENDGRID_API_KEY) {
-  mailService.setApiKey(process.env.SENDGRID_API_KEY);
+  const apiKey = process.env.SENDGRID_API_KEY.trim();
+  console.log(`SendGrid API key format check: starts with "SG.": ${apiKey.startsWith('SG.')}, length: ${apiKey.length}`);
+  mailService.setApiKey(apiKey);
+} else {
+  console.log('No SENDGRID_API_KEY found in environment variables');
 }
 
 interface EmailParams {
