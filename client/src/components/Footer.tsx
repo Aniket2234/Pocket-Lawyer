@@ -10,12 +10,11 @@ export default function Footer() {
   ];
 
   const legalAreas = [
-    { name: 'Constitutional Law', href: '/knowledge?category=constitutional' },
-    { name: 'Criminal Law', href: '/knowledge?category=criminal' },
-    { name: 'Civil Law', href: '/knowledge?category=civil' },
-    { name: 'Corporate Law', href: '/knowledge?category=corporate' },
-    { name: 'Family Law', href: '/knowledge?category=family' },
-    { name: 'Property Law', href: '/knowledge?category=property' },
+    { name: 'Arrest Rights', href: '/knowledge?category=arrest-rights' },
+    { name: 'Tenant Rights', href: '/knowledge?category=tenant-rights' },
+    { name: 'Cybercrime', href: '/knowledge?category=cybercrime' },
+    { name: 'Women Safety', href: '/knowledge?category=women-safety' },
+    { name: 'Consumer Complaints', href: '/knowledge?category=consumer-complaints' },
   ];
 
   const resources = [
