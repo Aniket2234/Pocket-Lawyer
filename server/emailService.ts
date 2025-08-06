@@ -1,8 +1,13 @@
 import { MailService } from '@sendgrid/mail';
 import type { Feedback } from '@shared/schema';
 
-// Email service disabled - feedback will be logged instead
+// Email service for feedback notifications
 const mailService = new MailService();
+
+// Only set API key if available
+if (process.env.SENDGRID_API_KEY) {
+  mailService.setApiKey(process.env.SENDGRID_API_KEY);
+}
 
 interface EmailParams {
   to: string;
@@ -13,14 +18,33 @@ interface EmailParams {
 }
 
 export async function sendEmail(params: EmailParams): Promise<boolean> {
-  // Email service disabled - just log the email content
-  console.log('📧 Email notification (email service disabled):', {
-    to: params.to,
-    from: params.from,
-    subject: params.subject,
-    content: params.text || params.html
-  });
-  return true;
+  // If no API key, just log the email content
+  if (!process.env.SENDGRID_API_KEY) {
+    console.log('📧 Email would be sent (API key needed):', {
+      to: params.to,
+      from: params.from,
+      subject: params.subject
+    });
+    return false;
+  }
+
+  try {
+    const emailData: any = {
+      to: params.to,
+      from: params.from,
+      subject: params.subject,
+    };
+    
+    if (params.text) emailData.text = params.text;
+    if (params.html) emailData.html = params.html;
+    
+    await mailService.send(emailData);
+    console.log(`✅ Email sent successfully to ${params.to}`);
+    return true;
+  } catch (error) {
+    console.error('SendGrid email error:', error);
+    return false;
+  }
 }
 
 export async function sendFeedbackNotification(feedback: Feedback): Promise<boolean> {
