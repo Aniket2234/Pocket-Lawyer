@@ -1,11 +1,17 @@
 import { useRoute } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
 import { ArrowLeft, Clock, User, Tag, Share2 } from 'lucide-react';
 import { Link } from 'wouter';
 
 export default function ArticleDetailPage() {
   const [, params] = useRoute('/knowledge/article/:id');
   const articleId = params?.id;
+
+  // Scroll to top when component mounts or article changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [articleId]);
 
   const { data: article, isLoading, error } = useQuery({
     queryKey: ['/api/knowledge', articleId],
