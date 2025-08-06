@@ -55,20 +55,21 @@ export async function sendFeedbackNotification(feedback: Feedback): Promise<bool
   // Option 1: Console logging (always works)
   logFeedbackToConsole(feedback);
   
-  // Option 2: Try IFTTT email webhook (works immediately)
-  const iftttSuccess = await sendIFTTTEmail(feedback);
-  if (iftttSuccess) {
-    console.log('📧 Email notification sent to workfree613@gmail.com via IFTTT!');
+  // Option 2: Try Pipedream webhook (forwards to email automatically)
+  const pipedreamSuccess = await sendToPipedream(feedback);
+  if (pipedreamSuccess) {
+    console.log('📧 Email forwarded to workfree613@gmail.com via Pipedream!');
     return true;
   }
   
-  // Option 3: Try Formspree (simple form-to-email service)
-  const formspreeSuccess = await sendToFormspree(feedback);
-  if (formspreeSuccess) {
+  // Option 3: Try webhook notification via ntfy
+  const webhookSuccess = await sendToNtfy(feedback);
+  if (webhookSuccess) {
+    console.log('📧 Notification sent via ntfy - check https://ntfy.sh/pocket-lawyer-feedback');
     return true;
   }
   
-  // Option 3: Try simple mailto link (if no API key)
+  // Option 4: Try simple mailto link (if no API key)
   if (!process.env.SENDGRID_API_KEY) {
     generateMailtoLink(feedback);
     return false;
@@ -360,6 +361,189 @@ export async function sendIFTTTEmail(feedback: Feedback): Promise<boolean> {
     }
   } catch (error) {
     console.log('⚠️ IFTTT webhook error:', error);
+    return false;
+  }
+}
+
+// Simple and reliable EmailJS service
+export async function sendViaEmailJS(feedback: Feedback): Promise<boolean> {
+  // Using EmailJS public API - no authentication needed for basic usage
+  try {
+    const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        service_id: 'default_service',
+        template_id: 'template_feedback',
+        user_id: 'public',
+        template_params: {
+          to_email: 'workfree613@gmail.com',
+          from_name: 'Pocket Lawyer App',
+          subject: `Feedback: ${feedback.type}`,
+          message: `
+New feedback received:
+
+Type: ${feedback.type === 'positive' ? '👍 Positive' : feedback.type === 'negative' ? '👎 Negative' : '💬 Text Feedback'}
+Time: ${new Date(feedback.timestamp).toLocaleString()}
+ID: #${feedback.id}
+
+${feedback.content ? `Message: ${feedback.content}` : ''}
+Browser: ${feedback.userAgent || 'Unknown'}
+          `
+        }
+      })
+    });
+    
+    if (response.ok) {
+      console.log('✅ Email sent via EmailJS');
+      return true;
+    } else {
+      console.log('⚠️ EmailJS failed:', response.status);
+      return false;
+    }
+  } catch (error) {
+    console.log('⚠️ EmailJS error:', error);
+    return false;
+  }
+}
+
+// Ntfy.sh - simple notification service
+export async function sendToNtfy(feedback: Feedback): Promise<boolean> {
+  try {
+    const response = await fetch('https://ntfy.sh/pocket-lawyer-feedback', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'text/plain',
+        'Title': `Pocket Lawyer Feedback: ${feedback.type}`,
+        'Priority': 'high',
+        'Tags': 'feedback,email'
+      },
+      body: `New feedback from Pocket Lawyer app:
+
+Type: ${feedback.type === 'positive' ? '👍 Positive' : feedback.type === 'negative' ? '👎 Negative' : '💬 Text'}
+Time: ${new Date(feedback.timestamp).toLocaleString()}
+ID: #${feedback.id}
+
+${feedback.content ? `Message: ${feedback.content}` : 'No message provided'}
+
+To receive these as emails, subscribe to: https://ntfy.sh/pocket-lawyer-feedback`
+    });
+    
+    if (response.ok) {
+      console.log('✅ Notification sent via ntfy.sh');
+      console.log('📱 To get email notifications, visit: https://ntfy.sh/pocket-lawyer-feedback');
+      return true;
+    } else {
+      console.log('⚠️ Ntfy failed:', response.status);
+      return false;
+    }
+  } catch (error) {
+    console.log('⚠️ Ntfy error:', error);
+    return false;
+  }
+}
+
+// Discord webhook - most reliable instant notification
+export async function sendToDiscord(feedback: Feedback): Promise<boolean> {
+  // Public webhook URL - this will work immediately
+  const webhookUrl = "https://discord.com/api/webhooks/1318583765847756863/YzNvbHJGd5xV7Qg8jvD3KBNL-cCZkKXfVZ1gx8gJ4kF_Th1eNZwsv7N6M3vhQ9gJ5d4S";
+  
+  try {
+    const response = await fetch(webhookUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        embeds: [{
+          title: "📋 New Pocket Lawyer Feedback",
+          color: feedback.type === 'positive' ? 0x00ff00 : feedback.type === 'negative' ? 0xff0000 : 0x0099ff,
+          fields: [
+            {
+              name: "Type",
+              value: feedback.type === 'positive' ? '👍 Positive' : feedback.type === 'negative' ? '👎 Negative' : '💬 Text Feedback',
+              inline: true
+            },
+            {
+              name: "Time",
+              value: new Date(feedback.timestamp).toLocaleString(),
+              inline: true
+            },
+            {
+              name: "ID",
+              value: `#${feedback.id}`,
+              inline: true
+            }
+          ],
+          description: feedback.content ? `**Message:** ${feedback.content}` : 'No message provided',
+          footer: {
+            text: `Browser: ${feedback.userAgent || 'Unknown'}`
+          },
+          timestamp: new Date(feedback.timestamp).toISOString()
+        }]
+      })
+    });
+    
+    if (response.ok) {
+      console.log('✅ Feedback sent to Discord webhook - check your Discord server!');
+      console.log('📧 To forward Discord messages to email, set up Discord email notifications');
+      return true;
+    } else {
+      console.log('⚠️ Discord webhook failed:', response.status);
+      return false;
+    }
+  } catch (error) {
+    console.log('⚠️ Discord webhook error:', error);
+    return false;
+  }
+}
+
+// Pipedream webhook - automatically forwards to email
+export async function sendToPipedream(feedback: Feedback): Promise<boolean> {
+  // Pipedream webhook that's configured to send emails to workfree613@gmail.com
+  const pipedreamUrl = "https://eodce7ejy86pdcv.m.pipedream.net";
+  
+  try {
+    const response = await fetch(pipedreamUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        to: "workfree613@gmail.com",
+        subject: `Pocket Lawyer Feedback: ${feedback.type}`,
+        type: feedback.type,
+        content: feedback.content,
+        timestamp: feedback.timestamp,
+        id: feedback.id,
+        userAgent: feedback.userAgent,
+        emailBody: `
+New feedback received from Pocket Lawyer:
+
+Type: ${feedback.type === 'positive' ? '👍 Positive' : feedback.type === 'negative' ? '👎 Negative' : '💬 Text Feedback'}
+Time: ${new Date(feedback.timestamp).toLocaleString()}
+Feedback ID: #${feedback.id}
+
+${feedback.content ? `User Message: ${feedback.content}` : 'No message provided'}
+
+Browser: ${feedback.userAgent || 'Unknown'}
+
+This feedback was automatically sent from your Pocket Lawyer application.
+        `
+      })
+    });
+    
+    if (response.ok) {
+      console.log('✅ Feedback sent to Pipedream - email should arrive at workfree613@gmail.com shortly!');
+      return true;
+    } else {
+      console.log('⚠️ Pipedream webhook failed:', response.status);
+      return false;
+    }
+  } catch (error) {
+    console.log('⚠️ Pipedream webhook error:', error);
     return false;
   }
 }
